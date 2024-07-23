@@ -13,11 +13,13 @@
 
 ## 0. Ficha del proyecto
 
-### **0.1 Nombre del proyecto:**
+### **0.1. Tu nombre completo:**
 
-### **0.2. Descripción breve:**
+### **0.2. Nombre del proyecto:**
 
-### **0.3. URL del proyecto:**
+### **0.3. Descripción breve del proyecto:**
+
+### **0.4. URL del proyecto:**
 
 > Puede ser pública o privada, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/).
 
