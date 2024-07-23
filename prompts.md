@@ -34,8 +34,6 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 
 **Prompt 3:**
 
-[link_to_architecture_diagram](link_to_architecture_diagram)
-
 ### **2.2. Descripción de componentes principales:**
 
 **Prompt 1:**
