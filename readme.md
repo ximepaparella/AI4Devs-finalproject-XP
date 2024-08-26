@@ -36,7 +36,7 @@
 
 ### **1.1. Objetivo:**
 
-> > Propósito del producto. Qué valor aporta, qué soluciona, y para quién.
+> Propósito del producto. Qué valor aporta, qué soluciona, y para quién.
 
 ### **1.2. Características y funcionalidades principales:**
 
