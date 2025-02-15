@@ -13,13 +13,13 @@
 
 ## 0. Ficha del proyecto
 
-### **0.1. Tu nombre completo:**
+### **0.1. Tu nombre completo:** Ximena Paparella
 
-### **0.2. Nombre del proyecto:**
+### **0.2. Nombre del proyecto:** Gifty
 
-### **0.3. Descripción breve del proyecto:**
+### **0.3. Descripción breve del proyecto:** The Gift Vouchers Platform is designed to enable businesses to create, sell, and manage customizable gift certificates. The platform will cater to small businesses, service providers, and enterprises, providing tools for personalization, sales tracking, and voucher validation through QR codes and unique alphanumeric codes. It will support white-label capabilities and integration with various platforms like WordPress and custom websites. The MVP will focus on the Argentine market, with plans to expand internationally.
 
-### **0.4. URL del proyecto:**
+### **0.4. URL del proyecto:** 
 
 > Puede ser pública o privada, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/).
 
@@ -32,15 +32,166 @@
 
 ## 1. Descripción general del producto
 
-> Describe en detalle los siguientes aspectos del producto:
 
-### **1.1. Objetivo:**
+### **1.1. Objetivo:** 
 
-> Propósito del producto. Qué valor aporta, qué soluciona, y para quién.
+- Provide an easy-to-use platform for small businesses and entrepreneurs to create and manage gift certificates.
+- Enable customers to purchase and redeem vouchers with secure validation methods.
+- Offer white-label solutions for businesses to customize the platform to their brand.
+- Integrate seamlessly with popular CMS platforms and payment gateways.
+- Deliver a scalable solution with robust analytics and multilingual capabilities.
 
 ### **1.2. Características y funcionalidades principales:**
 
-> Enumera y describe las características y funcionalidades específicas que tiene el producto para satisfacer las necesidades identificadas.
+### Voucher Creation and Customization
+
+- Customizable sender and recipient details.
+- Add personal messages.
+- Choose from a variety of voucher templates.
+- Set expiration dates and usage restrictions.
+- Attach vouchers to specific services or products.
+- Enable store managers to create and resend vouchers without requiring payment.
+
+### Payment Integration
+
+- Support for Mercado Pago in the MVP.
+- Scalability to add PayPal and Stripe for international payments.
+
+### Validation and Redemption
+
+- QR code generation for easy scanning.
+- Unique alphanumeric codes for manual validation.
+- Redemption tracking for businesses.
+
+### White-Label Features
+
+- Custom branding (logos, colors, domain).
+- API access for integration with client platforms.
+
+### Analytics and Reporting
+
+#### Key metrics for businesses:
+- Sales trends.
+- Top-selling products/services.
+- Unused vouchers.
+- Monthly sales reports.
+
+#### Platform-wide metrics for administrators.
+
+### Customer Experience
+
+- Automated email notifications for:
+  - Purchase confirmation.
+  - Voucher delivery.
+  - Expiration reminders.
+- User-friendly interface for customization.
+- Customer login to view vouchers, expiration dates, and transaction history.
+
+## Integration Capabilities
+
+- Ready-to-use plugin for WordPress.
+- APIs for custom websites.
+- Future support for widgets.
+
+### Multi-Purchase Capability
+
+- Allow customers to buy multiple vouchers in a single transaction.
+- Generate separate vouchers for each product or service purchased.
+
+
+## Diagramas
+
+### Main Flow
+
+This diagram gives a global view of how all users interact within the system. 
+Reference flows/main-flows.png
+
+`graph TD;
+  A[Customer Browses Vouchers] -->|Selects & Customizes| B[Voucher Purchase]
+  B -->|Payment Processed| C[Generate Voucher]
+  C -->|Send via Email| D[Customer Receives Voucher]
+  D -->|Views in My Account| E[Customer Dashboard]
+  D -->|Presents QR Code| F[Voucher Redemption]
+  F -->|Scans QR/Code Validation| G[Store Manager Confirms]
+  G -->|Voucher Marked as Redeemed| H[Transaction Completed]
+ subgraph Store Manager
+    I[Create & Manage Vouchers] -->|Generate New Vouchers| C
+    I -->|Modify & Resend| J[Voucher Resend]
+    G -->|View Sales & Analytics| K[Sales Dashboard]
+  end
+ subgraph Administrator
+    L[Manage Businesses & Users] -->|Oversee Activities| M[Platform Analytics]
+    M -->|Monitor Sales & Reports| K
+  end
+`
+
+###  Voucher Creation Flow
+The adminsitrator or store creates the services and the expirations or restriction to allow users to buy that voucher to gift.
+
+Reference: flows/voucher-creation.png
+
+`graph TD;
+  A[Store Manager Logs In] --> B[Navigates to Dashboard]
+  B --> C[Clicks 'Create New Voucher']
+  C --> D[Enters Voucher Details]
+  D -->|Selects Type| E{Voucher Type}
+  E -->|Service-based| F[Attach to a Service]
+  E -->|Product-based| G[Attach to a Product]
+  F --> H[Set Expiration & Restrictions]
+  G --> H
+  H --> I[Select Template or Upload Custom Design]
+  I --> J[Generate QR Code & Unique Key]
+  J --> K[Save & Confirm Voucher]
+  K --> L[Voucher Created & Available]
+`
+
+### Voucher Purchase Flow (buyer experience)
+
+All the users can interact with the stores page to select the service or product to buy a gift voucher and customize to use or give to another person. Reference: flows/buyer-flow.png
+
+`graph TD;
+  A[Customer Browses Store Page] --> B[Selects Voucher]
+  B --> C[Customizes Voucher]
+  C -->|Adds Recipient, Message, Template| D[Proceeds to Checkout]
+  D --> E[Selects Payment Method]
+  E -->|Confirms Payment| F[Payment Processing]
+  F -->|Success| G[Voucher Generated]
+  G --> H[Voucher Sent via Email]
+  G --> I[Customer Can View in My Account]
+  H --> J[Receives Confirmation Email with QR Code]
+`
+### Voucher Redemption Flow
+
+The user go to the store or exchange it online to validate the one use of that voucher and access to the benefict (service or product). Reference flows/redemtion-flow.png
+
+`graph TD;
+  A[Customer Visits Store] --> B[Presents QR Code or Unique Key]
+  B --> C[Store Manager Logs into Dashboard]
+  C --> D[Accesses 'Redeem Voucher' Section]
+  D -->|Scans QR Code| E[System Validates Voucher]
+  D -->|Manually Enters Code| E
+  E -->|Valid Voucher| F[Mark as Redeemed]
+  F --> G[Update Customer & Store Records]
+  G --> H[Transaction Completed]
+  E -->|Invalid Voucher| I[Display Error Message]
+`
+
+### Administrator Oversight Flow
+This is the main view of the dashboard for the stores to see the analytics and data for the vouchers that have been purchased, used, expired or resend those vouchers to the buyers. Reference: flows/admin-overview.png
+
+`graph TD;
+  A[Administrator Logs In] --> B[Accesses Admin Dashboard]
+  B --> C[Manages Businesses & Users]
+  B --> D[Oversees Voucher Transactions]
+  B --> E[Monitors Sales & Redemption Data]
+  C -->|Approve or Disable Stores| F[Update Store Status]
+  D -->|View Active & Redeemed Vouchers| G[Export Reports]
+  E -->|Analyze Sales Trends| H[Generate Analytics Reports]
+  H --> I[Identify Growth Opportunities]
+`
+
+### **1.3 Analisis de mercado y competencias:**
+https://docs.google.com/document/d/1BxpFzMfPuDJVSnw77Ef5vIN7iODImbm6NZtPzr1DvAs/edit?tab=t.0
 
 ### **1.3. Diseño y experiencia de usuario:**
 
@@ -99,6 +250,8 @@
 ---
 
 ## 5. Historias de Usuario
+
+PRD: https://docs.google.com/document/d/1cy7LfPV6TeUMitq3cQNGqtmtuxlmfG6iagUYqQQopuM/edit?usp=sharing
 
 > Documenta 3 de las historias de usuario principales utilizadas durante el desarrollo, teniendo en cuenta las buenas prácticas de producto al respecto.
 
