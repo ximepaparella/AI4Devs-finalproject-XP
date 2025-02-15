@@ -13,11 +13,14 @@
 
 ## 0. Ficha del proyecto
 
-### **0.1. Tu nombre completo:** Ximena Paparella
+### **0.1. Tu nombre completo:** 
+Ximena Paparella
 
-### **0.2. Nombre del proyecto:** Gifty
+### **0.2. Nombre del proyecto:** 
+Gifty
 
-### **0.3. Descripción breve del proyecto:** The Gift Vouchers Platform is designed to enable businesses to create, sell, and manage customizable gift certificates. The platform will cater to small businesses, service providers, and enterprises, providing tools for personalization, sales tracking, and voucher validation through QR codes and unique alphanumeric codes. It will support white-label capabilities and integration with various platforms like WordPress and custom websites. The MVP will focus on the Argentine market, with plans to expand internationally.
+### **0.3. Descripción breve del proyecto:** 
+The Gift Vouchers Platform is designed to enable businesses to create, sell, and manage customizable gift certificates. The platform will cater to small businesses, service providers, and enterprises, providing tools for personalization, sales tracking, and voucher validation through QR codes and unique alphanumeric codes. It will support white-label capabilities and integration with various platforms like WordPress and custom websites. The MVP will focus on the Argentine market, with plans to expand internationally.
 
 ### **0.4. URL del proyecto:** 
 
