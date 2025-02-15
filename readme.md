@@ -205,10 +205,59 @@ https://docs.google.com/document/d/1BxpFzMfPuDJVSnw77Ef5vIN7iODImbm6NZtPzr1DvAs/
 
 ---
 
-## 2. Arquitectura del Sistema
 
 ### **2.1. Diagrama de arquitectura:**
-> Usa el formato que consideres más adecuado para representar los componentes principales de la aplicación y las tecnologías utilizadas. Explica si sigue algún patrón predefinido, justifica por qué se ha elegido esta arquitectura, y destaca los beneficios principales que aportan al proyecto y justifican su uso, así como sacrificios o déficits que implica.
+
+El stack seleccionado y comentado a continuacion fue elegido con el objetivo de hacer un sitio a la vanguardia del mercado, de facil utilizacion y administracion por distintos desarrolladores y que cuide los patrones de desarrollo pensando en la escalabilidad y la mantenibilidad el proyecto. En node sacrificamos un poco el multithread pero realmente no lo creemos necesario de escalar a tales niveles y MongoDB es seleccionada para obtener una base mas escalable en distitos stores, pudiendo generar collections mas organizadas en caso de que la aplicacion escale, y no tener tanta anidacion de relaciones.
+
+La arquitectura de carpetas sera hexagonal con screaming architecture para beneficiar el entendimiento y la posibilidad de luego separar las entidades generando microservicios individuales. 
+
+El stack de react y nextjs esta siendo pensado para utilizar el Server side render y permitir la mayor performance posible de cara a los Web Vitals y a un buen posicionamiento dado que next nos beneficiara con su buena aplicacion de SEO.
+
+### Frontend - React
+Use Next.js for SSR (Server-Side Rendering) & improved performance.
+Tailwind CSS or SASS
+React Query
+AntD
+
+### Backend - Node.js API
+Express.js (lightweight and flexible) or NestJS (for modular architecture).
+Mongoose for MongoDB ORM.
+Joi for request validation.
+Helmet & CORS for security.
+Winston or Pino for logging.
+Rate Limiting (Express-Rate-Limit) to prevent API abuse.
+
+
+### Database
+MongoDB
+MongoDB Atlas for cloud hosting (or self-hosted MongoDB if needed).
+Indexing & Aggregations to optimize queries.
+Mongoose Schema Validations to enforce data consistency.
+
+### Security
+JWT + Refresh Tokens to manage authentication securely.
+bcrypt for password hashing.
+Environment Variables (.env) to store secrets securely.
+OAuth2 for social logins (Google, Facebook, etc.).
+
+### Infrastructure & DevOps
+Docker to containerize the application.
+CI/CD Pipelines with GitHub Actions or GitLab CI/CD.
+PM2 or Docker Compose for backend process management.
+
+### Tests
+Jest for unit testing
+Cypress for testing end to end for core functionalities
+
+### Payments
+Mercado Pago APK
+
+### Further improvements:
+Redis for session storage and API response caching.
+Redis for caching frequently accessed data.
+Load Balancer (NGINX or AWS ALB) for traffic management.
+Microservices (Future Scaling) – If needed later.
 
 
 ### **2.2. Descripción de componentes principales:**
@@ -239,16 +288,334 @@ https://docs.google.com/document/d/1BxpFzMfPuDJVSnw77Ef5vIN7iODImbm6NZtPzr1DvAs/
 
 > Recomendamos usar mermaid para el modelo de datos, y utilizar todos los parámetros que permite la sintaxis para dar el máximo detalle, por ejemplo las claves primarias y foráneas.
 
+### Relations Diagram
+
+`erDiagram
+    USER ||--o{ STORE : owns
+    STORE ||--o{ PRODUCT : offers
+    STORE ||--o{ VOUCHER : issues
+    PRODUCT ||--o{ VOUCHER : linked_to
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ PAYMENTDETAILS : has
+    VOUCHER ||--|{ VOUCHERUSAGE : used_in
+    USER ||--o{ VOUCHERUSAGE : redeems
+    USER ||--o{ VOUCHER : purchases
+`
+
+
+### Class Diagram
+
+`classDiagram
+    class USER {
+        string _id PK
+        string name
+        string email UNIQUE
+        string password
+        string role ENUM("admin", "store_manager", "customer")
+        date createdAt
+        date updatedAt
+    }
+    
+    class STORE {
+        string _id PK
+        string name
+        string ownerId FK
+        string email UNIQUE
+        string phone
+        string address
+        date createdAt
+        date updatedAt
+    }
+    
+    class PRODUCT {
+        string _id PK
+        string storeId FK
+        string name
+        string description
+        float price
+        boolean isActive
+        date createdAt
+        date updatedAt
+    }
+    
+    class VOUCHER {
+        string _id PK
+        string storeId FK
+        string productId FK
+        string customerId FK NULLABLE
+        string code UNIQUE
+        string status ENUM("active", "redeemed", "expired")
+        date expirationDate
+        string qrCode
+        date createdAt
+        date updatedAt
+    }
+
+    class ORDER {
+        string _id PK
+        string customerId FK
+        string voucherId FK
+        object paymentDetails
+        date createdAt
+        date updatedAt
+    }
+    
+    class PAYMENTDETAILS {
+        string paymentId UNIQUE
+        string paymentStatus ENUM("pending", "completed", "failed")
+        string paymentEmail
+        float amount
+        string provider ENUM("mercadopago", "paypal", "stripe")
+    }
+
+    class VOUCHERUSAGE {
+        string _id PK
+        string voucherId FK
+        string storeId FK
+        string customerId FK
+        date usedAt
+    }
+
+    class ADMIN {
+        string _id PK
+        string userId FK
+        date createdAt
+        date updatedAt
+    }
+`
+
 
 ### **3.2. Descripción de entidades principales:**
 
-> Recuerda incluir el máximo detalle de cada entidad, como el nombre y tipo de cada atributo, descripción breve si procede, claves primarias y foráneas, relaciones y tipo de relación, restricciones (unique, not null…), etc.
+#### 1. **User**
+- **_id** (string, PK): Unique identifier for the user.
+- **name** (string): Full name of the user.
+- **email** (string, UNIQUE): Email address for login and communication.
+- **password** (string): Hashed password for authentication.
+- **role** (enum): Defines the user type. Possible values: `admin`, `store_manager`, `customer`.
+- **createdAt** (date): Timestamp when the user was created.
+- **updatedAt** (date): Timestamp of the last update.
+
+#### 2. **Store**
+- **_id** (string, PK): Unique identifier for the store.
+- **name** (string): Name of the store.
+- **ownerId** (string, FK): Reference to the user (store owner).
+- **email** (string, UNIQUE): Contact email of the store.
+- **phone** (string): Contact phone number.
+- **address** (string): Physical address of the store.
+- **createdAt** (date): Timestamp when the store was created.
+- **updatedAt** (date): Timestamp of the last update.
+
+#### 3. **Product**
+- **_id** (string, PK): Unique identifier for the product or service.
+- **storeId** (string, FK): Reference to the store that offers this product.
+- **name** (string): Name of the product/service.
+- **description** (string): Detailed description of the product/service.
+- **price** (float): Price of the product/service.
+- **isActive** (boolean): Whether the product/service is currently available.
+- **createdAt** (date): Timestamp when the product was created.
+- **updatedAt** (date): Timestamp of the last update.
+
+#### 4. **Voucher**
+- **_id** (string, PK): Unique identifier for the voucher.
+- **storeId** (string, FK): Reference to the store issuing the voucher.
+- **productId** (string, FK): Reference to the associated product/service.
+- **customerId** (string, FK, NULLABLE): Reference to the customer who owns the voucher.
+- **code** (string, UNIQUE): Unique alphanumeric voucher code.
+- **status** (enum): Status of the voucher. Possible values: `active`, `redeemed`, `expired`.
+- **expirationDate** (date): Expiry date of the voucher.
+- **qrCode** (string): QR code for voucher validation.
+- **createdAt** (date): Timestamp when the voucher was created.
+- **updatedAt** (date): Timestamp of the last update.
+
+#### 5. **Order**
+- **_id** (string, PK): Unique identifier for the order.
+- **customerId** (string, FK): Reference to the customer who placed the order.
+- **voucherId** (string, FK): Reference to the purchased voucher.
+- **paymentDetails** (object): Contains details of the payment transaction.
+- **createdAt** (date): Timestamp when the order was placed.
+- **updatedAt** (date): Timestamp of the last update.
+
+#### 6. **PaymentDetails** (Embedded in Order)
+- **paymentId** (string, UNIQUE): Payment provider's transaction ID.
+- **paymentStatus** (enum): Status of the payment. Possible values: `pending`, `completed`, `failed`.
+- **paymentEmail** (string): Email associated with the payment.
+- **amount** (float): Total amount paid.
+- **provider** (enum): Payment provider used. Possible values: `mercadopago`, `paypal`, `stripe`.
+
+#### 7. **VoucherUsage**
+- **_id** (string, PK): Unique identifier for the voucher usage log.
+- **voucherId** (string, FK): Reference to the used voucher.
+- **storeId** (string, FK): Reference to the store where the voucher was redeemed.
+- **customerId** (string, FK): Reference to the customer who used the voucher.
+- **usedAt** (date): Timestamp when the voucher was redeemed.
+
+#### 8. **Admin**
+- **_id** (string, PK): Unique identifier for the admin.
+- **userId** (string, FK): Reference to the user assigned as an admin.
+- **createdAt** (date): Timestamp when the admin role was assigned.
+- **updatedAt** (date): Timestamp of the last update.
+
 
 ---
 
 ## 4. Especificación de la API
 
-> Si tu backend se comunica a través de API, describe los endpoints principales (máximo 3) en formato OpenAPI. Opcionalmente puedes añadir un ejemplo de petición y de respuesta para mayor claridad
+```yaml
+openapi: 3.0.0
+info:
+  title: Gift Voucher System API
+  description: API for managing gift vouchers, orders, and redemptions
+  version: 1.0.0
+
+paths:
+  /users/{userId}:
+    get:
+      summary: Get User by ID
+      description: Retrieve a user by their unique identifier.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  role:
+                    type: string
+                    enum: [admin, store_manager, customer]
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '404':
+          description: User not found
+
+  /vouchers:
+    post:
+      summary: Create a new Voucher
+      description: Generates a new voucher linked to a product and store.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [storeId, productId, code, expirationDate]
+              properties:
+                storeId:
+                  type: string
+                productId:
+                  type: string
+                customerId:
+                  type: string
+                  nullable: true
+                code:
+                  type: string
+                status:
+                  type: string
+                  enum: [active, redeemed, expired]
+                expirationDate:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Voucher created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  storeId:
+                    type: string
+                  productId:
+                    type: string
+                  code:
+                    type: string
+                  expirationDate:
+                    type: string
+                    format: date-time
+        '400':
+          description: Invalid input data
+
+  /orders:
+    post:
+      summary: Create a new Order
+      description: Places an order for a voucher purchase.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId, voucherId, paymentDetails]
+              properties:
+                customerId:
+                  type: string
+                voucherId:
+                  type: string
+                paymentDetails:
+                  type: object
+                  properties:
+                    paymentId:
+                      type: string
+                    paymentStatus:
+                      type: string
+                      enum: [pending, completed, failed]
+                    paymentEmail:
+                      type: string
+                    amount:
+                      type: number
+                    provider:
+                      type: string
+                      enum: [mercadopago, paypal, stripe]
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  customerId:
+                    type: string
+                  voucherId:
+                    type: string
+                  paymentDetails:
+                    type: object
+                    properties:
+                      paymentId:
+                        type: string
+                      paymentStatus:
+                        type: string
+                      paymentEmail:
+                        type: string
+                      amount:
+                        type: number
+                      provider:
+                        type: string
+        '400':
+          description: Invalid input data
+```
+
 
 ---
 
@@ -259,22 +626,192 @@ PRD: https://docs.google.com/document/d/1cy7LfPV6TeUMitq3cQNGqtmtuxlmfG6iagUYqQQ
 > Documenta 3 de las historias de usuario principales utilizadas durante el desarrollo, teniendo en cuenta las buenas prácticas de producto al respecto.
 
 **Historia de Usuario 1**
+## User Story 1: Create a Voucher
+
+### Title: Store Manager can create a voucher
+
+**Description:**  
+As a Store Manager, I want to create a voucher for a specific product or service, so that customers can purchase and redeem it.
+
+### Acceptance Criteria:
+- The Store Manager can input the required details (`storeId`, `productId`, `code`, `expirationDate`).
+- The voucher is stored in the system with a unique identifier and status (`active`).
+- The Store Manager receives a confirmation that the voucher has been created.
+- The system validates that all required fields are provided.
+- The Store Manager can see the newly created voucher in their dashboard.
+
+
 
 **Historia de Usuario 2**
 
+## User Story 2: Purchase a Voucher
+
+### Title: Customer can purchase a voucher
+
+**Description:**  
+As a Customer, I want to purchase a voucher online, so that I can redeem it later for a product or service.
+
+### Acceptance Criteria:
+- The customer can select a voucher and proceed to checkout.
+- The system processes the payment and generates an order.
+- The customer receives an email confirmation with the voucher details.
+- The order is stored in the system with the payment details.
+
 **Historia de Usuario 3**
+
+## User Story 3: Redeem a Voucher
+
+### Title: Customer can redeem a voucher
+
+**Description:**  
+As a Customer, I want to redeem my voucher at a store, so that I can claim the purchased product or service.
+
+### Acceptance Criteria:
+- The customer presents their voucher at the store.
+- The Store Manager can scan the QR code or enter the voucher code manually.
+- The system validates the voucher and updates its status to redeemed.
+- The customer and Store Manager receive a confirmation.
 
 ---
 
 ## 6. Tickets de Trabajo
 
-> Documenta 3 de los tickets de trabajo principales del desarrollo, uno de backend, uno de frontend, y uno de bases de datos. Da todo el detalle requerido para desarrollar la tarea de inicio a fin teniendo en cuenta las buenas prácticas al respecto. 
-
 **Ticket 1**
+
+## Development Tickets for User Story 1
+
+### Backend: Implement Voucher Creation API
+
+#### Title: Develop API endpoint for voucher creation
+
+**Description:**  
+Implement the `/vouchers` endpoint to allow Store Managers to create vouchers.
+
+**Tasks:**
+- Create a `POST /vouchers` API endpoint.
+- Implement request validation for required fields.
+- Store the voucher in MongoDB with a unique code.
+- Return a success message upon creation.
+- Add error handling for missing or invalid fields.
+
+---
+
+### Frontend: Build Voucher Creation Form
+
+#### Title: Develop UI for creating a voucher
+
+**Description:**  
+Implement a form on the Store Manager's dashboard to allow voucher creation.
+
+**Tasks:**
+- Design and implement a form with fields (`storeId`, `productId`, `code`, `expirationDate`).
+- Validate inputs before submitting.
+- Display success/failure messages.
+- Update the dashboard to reflect new vouchers.
+
+---
+
+### Database: Define Voucher Schema
+
+#### Title: Set up MongoDB schema for vouchers
+
+**Description:**  
+Define the Voucher model in MongoDB.
+
+**Tasks:**
+- Create a `voucher` collection with fields (`storeId`, `productId`, `customerId`, `code`, `status`, `expirationDate`, `qrCode`).
+- Ensure the `code` field is unique.
+- Implement indexing for optimized queries.
 
 **Ticket 2**
 
+## Development Tickets for User Story 2
+
+### Backend: Implement Order Processing API
+
+#### Title: Develop API for processing voucher purchases
+
+**Description:**  
+Implement the `/orders` endpoint to handle voucher purchases.
+
+**Tasks:**
+- Create a `POST /orders` API endpoint.
+- Validate request payload (`customer`, `voucher`, `payment details`).
+- Process payment via MercadoPago.
+- Store order details in MongoDB.
+- Send email confirmation to the customer.
+
+---
+
+### Frontend: Implement Voucher Purchase Flow
+
+#### Title: Develop UI for voucher purchase
+
+**Description:**  
+Implement the frontend flow for purchasing a voucher.
+
+**Tasks:**
+- Allow customers to select a voucher and proceed to checkout.
+- Integrate with the payment gateway.
+- Show purchase confirmation and receipt.
+
+---
+
+### Database: Define Order Schema
+
+#### Title: Set up MongoDB schema for orders
+
+**Description:**  
+Define the Order model in MongoDB.
+
+**Tasks:**
+- Create an `order` collection with fields (`customerId`, `voucherId`, `paymentDetails`, `status`).
+- Ensure data integrity between vouchers and orders.
+
+
 **Ticket 3**
+
+## Development Tickets for User Story 3
+
+### Backend: Implement Voucher Redemption API
+
+#### Title: Develop API for voucher redemption
+
+**Description:**  
+Implement the `/vouchers/redeem` endpoint to validate and mark vouchers as redeemed.
+
+**Tasks:**
+- Create a `POST /vouchers/redeem` API endpoint.
+- Validate voucher code and store ID.
+- Update the voucher status to redeemed.
+- Send confirmation to the Store Manager and customer.
+
+---
+
+### Frontend: Implement Redemption Flow
+
+#### Title: Develop UI for voucher redemption
+
+**Description:**  
+Implement the interface for scanning and redeeming vouchers.
+
+**Tasks:**
+- Allow Store Managers to enter a voucher code or scan a QR code.
+- Show success/failure messages based on validation.
+- Update the dashboard with redeemed vouchers.
+
+---
+
+### Database: Define Voucher Usage Schema
+
+#### Title: Set up MongoDB schema for voucher usage
+
+**Description:**  
+Define the `VoucherUsage` model in MongoDB.
+
+**Tasks:**
+- Create a `voucherUsage` collection with fields (`voucherId`, `storeId`, `customerId`, `usedAt`).
+- Ensure validation for tracking redemptions.
 
 ---
 

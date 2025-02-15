@@ -152,10 +152,102 @@ Now lets focus on being an expert product and business analyst and start buildin
 ### **2.1. Diagrama de arquitectura:**
 
 **Prompt 1:**
+now based on this stack, as an expert software architect we need to continue and define the main entities and relations for our System.
+
+We need to create the Mermaid Diagram for the entire system architecture, defining each entity and their fields with their correct definition and relations.
+
+Do you have questions? Lets start defining together.
+
+## CHAT GPT 4o answer:
+Step 1: Identifying the Main Entities
+Based on the PRD and MVP features, we will have the following entities:
+
+User
+
+Store Managers, Administrators, Customers
+Role-based permissions
+Voucher
+
+Created by Store Managers
+Assigned to specific customers
+Contains expiration dates, QR codes, and unique alphanumeric keys
+Transaction
+
+Tracks payments and voucher purchases
+Links customers, vouchers, and payment status
+Store
+
+Each store has Store Managers
+Stores create vouchers for their products/services
+Product/Service
+
+Vouchers are associated with a product or service
+Redemption
+
+Stores records of voucher redemptions
+Links to the Store and Customer
+
+---
+
+Key Relationships in the System
+Users & Roles
+
+A User can be an Administrator, Store Manager, or Customer.
+Admins manage stores and oversee transactions.
+Store Managers own Stores and create Vouchers.
+Customers purchase Vouchers and redeem them.
+Stores & Products
+
+A Store offers multiple Products/Services.
+Vouchers are linked to specific Products.
+Transactions & Vouchers
+
+Customers buy Vouchers, generating Transactions.
+Transactions are completed through MercadoPago, PayPal, or Stripe.
+Voucher Redemption
+
+Customers redeem Vouchers at Stores.
+Redemptions track usage and status.
 
 **Prompt 2:**
+Ok lets change trasaction for Orders, because they are orders of ayment.
+lets add to the order an object for payment that will have payment id, payment status, payment email and some other mercado pago apk needs.
+
+lets update the redeption word, is not good, propose others please.
+
+remember that the user can see their own orders or buys on the profile page, lets add some fields for that. 
+
+and make the diagram correct because is not right, is failing, have code issues
+
+--
+
+GPT 4o Answer:
+
+Great updates! I'll address each of your points:
+
+Rename Transaction to Order and modify its structure to include a paymentDetails object containing:
+
+paymentId
+paymentStatus
+paymentEmail
+Other necessary MercadoPago details.
+Rename Redemption to something more meaningful. Here are a few alternatives:
+
+VoucherUsage
+VoucherClaim
+VoucherValidation
+VoucherRedemption
+UsageLog
+I suggest VoucherUsage as it clearly represents the act of using a voucher.
+
+Ensure the User can see their Orders and add relevant fields.
+
+Fix syntax issues in the diagram to ensure it renders correctly.
+
 
 **Prompt 3:**
+
+
 
 ### **2.2. Descripción de componentes principales:**
 
