@@ -259,7 +259,68 @@ Fix syntax issues in the diagram to ensure it renders correctly.
 
 ### **2.3. Descripción de alto nivel del proyecto y estructura de ficheros**
 
-**Prompt 1:**
+**Prompt 1:** 
+
+As an expert Software Architect i need you to create our API For the Gifty Project a Node.js REST API project following Hexagonal Architecture with Screaming Architecture file organization.
+
+## Project Details:
+- **Backend Framework:** Node.js with Express
+- **Database:** MongoDB using Mongoose ORM
+- **Validation:** Joi for schema validation
+- **Authentication:** JWT-based authentication
+- **Folder Structure:** Hexagonal Architecture (Ports & Adapters)
+- **Code Style:** ESLint + Prettier
+
+## Monorepo Setup:
+- Use **Turborepo** or **Nx** for monorepo management.
+- Create a package for `backend` in the monorepo.
+- Later, we will add the `frontend` package.
+
+## Folder Structure (Screaming Architecture):
+/gift-voucher-platform ├── packages │ ├── backend │ │ ├── src │ │ │ ├── application (use-cases) │ │ │ ├── domain (entities, aggregates, domain logic) │ │ │ ├── infrastructure (database, API clients, repositories) │ │ │ ├── interfaces (controllers, HTTP requests, event listeners) │ │ │ ├── config (env variables, database config) │ │ │ ├── server.ts (Express setup) │ │ │ ├── app.ts (App entry point) │ │ ├── package.json │ │ ├── tsconfig.json │ │ ├── .env.example │ │ ├── README.md │ ├── frontend (To be added later) ├── turbo.json (or nx.json for workspace management) ├── package.json (Monorepo root) ├── .gitignore ├── README.md
+
+markdown
+Copiar
+Editar
+
+## Backend Setup:
+1. **Install Dependencies**
+   - `express`, `mongoose`, `dotenv`, `cors`, `helmet`, `jsonwebtoken`
+   - `express-rate-limit`, `winston` (for logging)
+   - `joi` (for request validation)
+   - `ts-node`, `typescript`, `nodemon` (for TypeScript setup)
+   - `eslint`, `prettier` (for code quality)
+
+2. **Database Configuration**
+   - Use `.env` file to store database connection details (`MONGO_URI`).
+   - Implement **Mongoose Models** based on our PRD.
+
+3. **Implement Core Modules:**
+   - **Users:** Signup/Login, JWT authentication
+   - **Vouchers:** CRUD operations
+   - **Orders:** Create & retrieve orders
+   - **Payments:** Integrate MercadoPago
+   - **Voucher Redemption:** Track voucher usage
+
+4. **Hexagonal Architecture Principles**
+   - Use **adapters** for API calls and database interactions.
+   - Separate **business logic** inside `application` layer.
+   - Implement **dependency injection** for flexibility.
+
+5. **API Documentation**
+   - Generate OpenAPI spec using `swagger-jsdoc`.
+
+6. **Run the Server**
+   - Provide startup scripts in `package.json`.
+
+## Expected Output:
+- A **fully structured repository** with the necessary configuration.
+- Preconfigured with `Express`, `Mongoose`, `Joi`, `JWT`, `dotenv`, and TypeScript.
+- A `README.md` file with setup instructions.
+
+---
+
+Do you have any doubts?
 
 **Prompt 2:**
 
