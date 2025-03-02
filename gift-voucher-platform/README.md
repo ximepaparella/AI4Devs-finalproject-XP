@@ -93,4 +93,77 @@ The API includes the following core modules:
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.
+
+## Security and Environment Variables
+
+### Environment Variables
+
+This project uses environment variables to manage sensitive configuration. Each package (backend and frontend) has its own set of environment variables.
+
+#### Backend Environment Variables
+
+1. Copy the example environment file to create your own:
+   ```bash
+   cp packages/backend/.env.example packages/backend/.env
+   ```
+
+2. Update the values in `.env` with your actual credentials and configuration.
+
+3. Important environment variables for the backend:
+   - `MONGO_URI`: Your MongoDB connection string
+   - `JWT_SECRET`: Secret key for JWT token generation
+   - `MERCADO_PAGO_ACCESS_TOKEN`: Your MercadoPago access token
+
+#### Frontend Environment Variables
+
+1. Copy the example environment file to create your own:
+   ```bash
+   cp packages/frontend/.env.example packages/frontend/.env
+   ```
+
+2. Update the values in `.env` with your actual configuration.
+
+3. Important environment variables for the frontend:
+   - `NEXT_PUBLIC_API_URL`: URL of the backend API
+   - `NEXT_PUBLIC_AUTH_DOMAIN`: Authentication domain
+   - `NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY`: MercadoPago public key
+
+### Security Best Practices
+
+1. **Never commit sensitive information**: All `.env` files are excluded in `.gitignore` to prevent accidental commits of sensitive data.
+
+2. **Use environment variables**: Never hardcode sensitive information in your code.
+
+3. **Rotate secrets regularly**: Change your JWT secrets and API keys periodically.
+
+4. **Use secure connections**: Always use HTTPS in production.
+
+5. **Validate user input**: All user input should be validated and sanitized to prevent injection attacks.
+
+6. **Implement proper authentication and authorization**: Ensure that users can only access resources they are authorized to.
+
+### Security Check Script
+
+The project includes a security check script that helps identify potentially sensitive information in the codebase. This script scans for common patterns that might indicate sensitive data and checks for .env files that should not be committed.
+
+To run the security check:
+
+```bash
+# Make the script executable (Unix/Linux/macOS)
+chmod +x scripts/check-sensitive-info.sh
+
+# Run the script
+./scripts/check-sensitive-info.sh
+```
+
+For Windows users:
+```bash
+# Using Git Bash
+bash scripts/check-sensitive-info.sh
+
+# Using PowerShell
+sh scripts/check-sensitive-info.sh
+```
+
+Run this script before committing changes to ensure no sensitive information is accidentally exposed. 
