@@ -1,30 +1,31 @@
 import express from 'express';
+import {
+  getAllOrders,
+  getOrderById,
+  getOrdersByCustomerId,
+  createOrder,
+  updateOrder,
+  deleteOrder
+} from '../../application/controllers/orderController';
 
 const router = express.Router();
 
 // GET all orders
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'Get all orders - endpoint to be implemented' });
-});
+router.get('/', getAllOrders);
+
+// GET orders by customer ID
+router.get('/customer/:customerId', getOrdersByCustomerId);
 
 // GET order by ID
-router.get('/:id', (req, res) => {
-  res.status(200).json({ message: `Get order with ID: ${req.params.id} - endpoint to be implemented` });
-});
+router.get('/:id', getOrderById);
 
 // POST create new order
-router.post('/', (req, res) => {
-  res.status(201).json({ message: 'Create new order - endpoint to be implemented', data: req.body });
-});
+router.post('/', createOrder);
 
 // PUT update order
-router.put('/:id', (req, res) => {
-  res.status(200).json({ message: `Update order with ID: ${req.params.id} - endpoint to be implemented`, data: req.body });
-});
+router.put('/:id', updateOrder);
 
 // DELETE order
-router.delete('/:id', (req, res) => {
-  res.status(200).json({ message: `Delete order with ID: ${req.params.id} - endpoint to be implemented` });
-});
+router.delete('/:id', deleteOrder);
 
 export { router as orderRoutes }; 

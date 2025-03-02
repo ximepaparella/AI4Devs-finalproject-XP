@@ -970,6 +970,255 @@ Redeems a voucher by its code.
     - 400 Bad Request - Voucher already redeemed or expired
     - 404 Not Found - Voucher not found
 
+### Order Endpoints
+
+#### Get All Orders
+
+Retrieves a list of all orders with optional filtering, sorting, and pagination.
+
+- **URL**: `/orders`
+- **Method**: `GET`
+- **Query Parameters**:
+  - `customerId`: Filter orders by customer ID
+  - `voucherId`: Filter orders by voucher ID
+  - `paymentStatus`: Filter by payment status (pending, completed, failed)
+  - `sort`: Sort by field (prefix with - for descending order, e.g., -createdAt)
+  - `limit`: Number of results per page (default: 10)
+  - `page`: Page number (default: 1)
+- **Access**: Private/Admin
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "count": 2,
+      "data": [
+        {
+          "_id": "60d21b4667d0d8992e610c93",
+          "customerId": "60d21b4667d0d8992e610c85",
+          "voucherId": "60d21b4667d0d8992e610c91",
+          "paymentDetails": {
+            "paymentId": "PAY-123456789",
+            "paymentStatus": "completed",
+            "paymentEmail": "customer@example.com",
+            "amount": 99.99,
+            "provider": "paypal"
+          },
+          "createdAt": "2023-06-22T19:12:38.657Z",
+          "updatedAt": "2023-06-22T19:12:38.657Z"
+        },
+        {
+          "_id": "60d21b4667d0d8992e610c94",
+          "customerId": "60d21b4667d0d8992e610c86",
+          "voucherId": "60d21b4667d0d8992e610c92",
+          "paymentDetails": {
+            "paymentId": "PAY-987654321",
+            "paymentStatus": "pending",
+            "paymentEmail": "another.customer@example.com",
+            "amount": 149.99,
+            "provider": "stripe"
+          },
+          "createdAt": "2023-06-22T19:12:38.657Z",
+          "updatedAt": "2023-06-22T19:12:38.657Z"
+        }
+      ]
+    }
+    ```
+
+#### Get Order by ID
+
+Retrieves a specific order by ID.
+
+- **URL**: `/orders/:id`
+- **Method**: `GET`
+- **URL Parameters**: 
+  - `id`: MongoDB ObjectId of the order
+- **Access**: Private
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "data": {
+        "_id": "60d21b4667d0d8992e610c93",
+        "customerId": "60d21b4667d0d8992e610c85",
+        "voucherId": "60d21b4667d0d8992e610c91",
+        "paymentDetails": {
+          "paymentId": "PAY-123456789",
+          "paymentStatus": "completed",
+          "paymentEmail": "customer@example.com",
+          "amount": 99.99,
+          "provider": "paypal"
+        },
+        "createdAt": "2023-06-22T19:12:38.657Z",
+        "updatedAt": "2023-06-22T19:12:38.657Z"
+      }
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Invalid ID format
+    - 404 Not Found - Order not found
+
+#### Get Orders by Customer ID
+
+Retrieves all orders for a specific customer with optional sorting and pagination.
+
+- **URL**: `/orders/customer/:customerId`
+- **Method**: `GET`
+- **URL Parameters**: 
+  - `customerId`: MongoDB ObjectId of the customer
+- **Query Parameters**:
+  - `sort`: Sort by field (prefix with - for descending order, e.g., -createdAt)
+  - `limit`: Number of results per page (default: 10)
+  - `page`: Page number (default: 1)
+- **Access**: Private
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "count": 1,
+      "data": [
+        {
+          "_id": "60d21b4667d0d8992e610c93",
+          "customerId": "60d21b4667d0d8992e610c85",
+          "voucherId": "60d21b4667d0d8992e610c91",
+          "paymentDetails": {
+            "paymentId": "PAY-123456789",
+            "paymentStatus": "completed",
+            "paymentEmail": "customer@example.com",
+            "amount": 99.99,
+            "provider": "paypal"
+          },
+          "createdAt": "2023-06-22T19:12:38.657Z",
+          "updatedAt": "2023-06-22T19:12:38.657Z"
+        }
+      ]
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Invalid customer ID format
+    - 404 Not Found - Customer not found
+
+#### Create Order
+
+Creates a new order.
+
+- **URL**: `/orders`
+- **Method**: `POST`
+- **Access**: Private
+- **Request Body**:
+  ```json
+  {
+    "customerId": "60d21b4667d0d8992e610c85",
+    "voucherId": "60d21b4667d0d8992e610c91",
+    "paymentDetails": {
+      "paymentId": "PAY-123456789",
+      "paymentStatus": "completed",
+      "paymentEmail": "customer@example.com",
+      "amount": 99.99,
+      "provider": "paypal"
+    }
+  }
+  ```
+- **Response**:
+  - **Code**: 201 Created
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "data": {
+        "_id": "60d21b4667d0d8992e610c93",
+        "customerId": "60d21b4667d0d8992e610c85",
+        "voucherId": "60d21b4667d0d8992e610c91",
+        "paymentDetails": {
+          "paymentId": "PAY-123456789",
+          "paymentStatus": "completed",
+          "paymentEmail": "customer@example.com",
+          "amount": 99.99,
+          "provider": "paypal"
+        },
+        "createdAt": "2023-06-22T19:12:38.657Z",
+        "updatedAt": "2023-06-22T19:12:38.657Z"
+      }
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Validation error, invalid ID format, or voucher already purchased
+    - 404 Not Found - Customer or voucher not found
+
+#### Update Order
+
+Updates an existing order.
+
+- **URL**: `/orders/:id`
+- **Method**: `PUT`
+- **URL Parameters**: 
+  - `id`: MongoDB ObjectId of the order
+- **Access**: Private/Admin
+- **Request Body**:
+  ```json
+  {
+    "paymentDetails": {
+      "paymentId": "PAY-987654321",
+      "paymentStatus": "completed",
+      "paymentEmail": "updated.customer@example.com",
+      "amount": 149.99,
+      "provider": "stripe"
+    }
+  }
+  ```
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "data": {
+        "_id": "60d21b4667d0d8992e610c93",
+        "customerId": "60d21b4667d0d8992e610c85",
+        "voucherId": "60d21b4667d0d8992e610c91",
+        "paymentDetails": {
+          "paymentId": "PAY-987654321",
+          "paymentStatus": "completed",
+          "paymentEmail": "updated.customer@example.com",
+          "amount": 149.99,
+          "provider": "stripe"
+        },
+        "createdAt": "2023-06-22T19:12:38.657Z",
+        "updatedAt": "2023-06-22T19:15:38.657Z"
+      }
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Invalid ID format or validation error
+    - 404 Not Found - Order not found
+
+#### Delete Order
+
+Deletes an order.
+
+- **URL**: `/orders/:id`
+- **Method**: `DELETE`
+- **URL Parameters**: 
+  - `id`: MongoDB ObjectId of the order
+- **Access**: Private/Admin
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "data": {}
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Invalid ID format
+    - 404 Not Found - Order not found
+
 ## Data Models
 
 ### User
@@ -1026,6 +1275,24 @@ Redeems a voucher by its code.
   qrCode: string;        // Required, base64 encoded QR code image
   createdAt: Date;       // Automatically set
   updatedAt: Date;       // Automatically updated
+}
+```
+
+### Order
+
+```typescript
+{
+  customerId: ObjectId;     // Required, reference to User
+  voucherId: ObjectId;      // Required, reference to Voucher
+  paymentDetails: {
+    paymentId: string;      // Required
+    paymentStatus: string;  // Required, enum: ['pending', 'completed', 'failed']
+    paymentEmail: string;   // Required, valid email format
+    amount: number;         // Required, min: 0.01
+    provider: string;       // Required, enum: ['mercadopago', 'paypal', 'stripe']
+  };
+  createdAt: Date;          // Automatically set
+  updatedAt: Date;          // Automatically updated
 }
 ```
 
