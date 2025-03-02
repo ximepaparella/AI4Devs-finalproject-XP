@@ -30,7 +30,14 @@ export const connectToDatabase = async (): Promise<void> => {
     const mongoUri = process.env.MONGO_URI;
     
     if (!mongoUri) {
-      throw new Error('MONGO_URI environment variable is not defined');
+      logger.warn('MONGO_URI environment variable is not defined, using in-memory database for development');
+      // In development, we can continue without a real MongoDB connection
+      if (process.env.NODE_ENV === 'development') {
+        logger.info('Running in development mode without MongoDB connection');
+        return;
+      } else {
+        throw new Error('MONGO_URI environment variable is not defined');
+      }
     }
     
     await mongoose.connect(mongoUri);
@@ -38,7 +45,13 @@ export const connectToDatabase = async (): Promise<void> => {
     logger.info('Connected to MongoDB successfully');
   } catch (error) {
     logger.error('Failed to connect to MongoDB', { error });
-    process.exit(1);
+    
+    // In development, we can continue without a real MongoDB connection
+    if (process.env.NODE_ENV === 'development') {
+      logger.info('Running in development mode without MongoDB connection');
+    } else {
+      process.exit(1);
+    }
   }
 };
 
