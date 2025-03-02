@@ -1,30 +1,43 @@
 import express from 'express';
+import { 
+  getAllVouchers, 
+  getVoucherById, 
+  getVoucherByCode,
+  getVouchersByStoreId,
+  getVouchersByCustomerId,
+  createVoucher, 
+  updateVoucher, 
+  deleteVoucher,
+  redeemVoucher
+} from '../../application/controllers/voucherController';
 
 const router = express.Router();
 
 // GET all vouchers
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'Get all vouchers - endpoint to be implemented' });
-});
+router.get('/', getAllVouchers);
 
 // GET voucher by ID
-router.get('/:id', (req, res) => {
-  res.status(200).json({ message: `Get voucher with ID: ${req.params.id} - endpoint to be implemented` });
-});
+router.get('/:id', getVoucherById);
+
+// GET voucher by code
+router.get('/code/:code', getVoucherByCode);
+
+// GET vouchers by store ID
+router.get('/store/:storeId', getVouchersByStoreId);
+
+// GET vouchers by customer ID
+router.get('/customer/:customerId', getVouchersByCustomerId);
 
 // POST create new voucher
-router.post('/', (req, res) => {
-  res.status(201).json({ message: 'Create new voucher - endpoint to be implemented', data: req.body });
-});
+router.post('/', createVoucher);
 
 // PUT update voucher
-router.put('/:id', (req, res) => {
-  res.status(200).json({ message: `Update voucher with ID: ${req.params.id} - endpoint to be implemented`, data: req.body });
-});
+router.put('/:id', updateVoucher);
 
 // DELETE voucher
-router.delete('/:id', (req, res) => {
-  res.status(200).json({ message: `Delete voucher with ID: ${req.params.id} - endpoint to be implemented` });
-});
+router.delete('/:id', deleteVoucher);
+
+// PUT redeem voucher
+router.put('/code/:code/redeem', redeemVoucher);
 
 export { router as voucherRoutes }; 

@@ -244,6 +244,510 @@
           }
         }
       ]
+    },
+    {
+      "name": "Products",
+      "description": "Product management endpoints",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/products",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "storeId",
+                  "value": "{{store_id}}",
+                  "description": "Filter by store ID",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "price",
+                  "description": "Sort by field (prefix with - for descending)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results per page",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number",
+                  "disabled": true
+                },
+                {
+                  "key": "showInactive",
+                  "value": "true",
+                  "description": "Show inactive products",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve all products with optional filtering and pagination"
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/products/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{product_id}}",
+                  "description": "Product ID"
+                }
+              ]
+            },
+            "description": "Retrieve a specific product by ID"
+          }
+        },
+        {
+          "name": "Get Products by Store ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/products/store/:storeId",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products", "store", ":storeId"],
+              "variable": [
+                {
+                  "key": "storeId",
+                  "value": "{{store_id}}",
+                  "description": "Store ID"
+                }
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "price",
+                  "description": "Sort by field (prefix with - for descending)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results per page",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number",
+                  "disabled": true
+                },
+                {
+                  "key": "showInactive",
+                  "value": "true",
+                  "description": "Show inactive products",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve all products for a specific store"
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"storeId\": \"{{store_id}}\",\n  \"name\": \"Example Product\",\n  \"description\": \"This is an example product description\",\n  \"price\": 99.99,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/products",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products"]
+            },
+            "description": "Create a new product"
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Product\",\n  \"description\": \"This is an updated product description\",\n  \"price\": 149.99,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/products/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{product_id}}",
+                  "description": "Product ID"
+                }
+              ]
+            },
+            "description": "Update an existing product"
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/products/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{product_id}}",
+                  "description": "Product ID"
+                }
+              ]
+            },
+            "description": "Delete a product"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vouchers",
+      "description": "Voucher management endpoints",
+      "item": [
+        {
+          "name": "Get All Vouchers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers"],
+              "query": [
+                {
+                  "key": "storeId",
+                  "value": "{{store_id}}",
+                  "description": "Filter by store ID",
+                  "disabled": true
+                },
+                {
+                  "key": "productId",
+                  "value": "{{product_id}}",
+                  "description": "Filter by product ID",
+                  "disabled": true
+                },
+                {
+                  "key": "customerId",
+                  "value": "{{user_id}}",
+                  "description": "Filter by customer ID",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active, redeemed, expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "-createdAt",
+                  "description": "Sort by field (prefix with - for descending)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results per page",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve all vouchers with optional filtering and pagination"
+          }
+        },
+        {
+          "name": "Get Voucher by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{voucher_id}}",
+                  "description": "Voucher ID"
+                }
+              ]
+            },
+            "description": "Retrieve a specific voucher by ID"
+          }
+        },
+        {
+          "name": "Get Voucher by Code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers/code/:code",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers", "code", ":code"],
+              "variable": [
+                {
+                  "key": "code",
+                  "value": "{{voucher_code}}",
+                  "description": "Voucher Code"
+                }
+              ]
+            },
+            "description": "Retrieve a specific voucher by its code"
+          }
+        },
+        {
+          "name": "Get Vouchers by Store ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers/store/:storeId",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers", "store", ":storeId"],
+              "variable": [
+                {
+                  "key": "storeId",
+                  "value": "{{store_id}}",
+                  "description": "Store ID"
+                }
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active, redeemed, expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "-createdAt",
+                  "description": "Sort by field (prefix with - for descending)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results per page",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve all vouchers for a specific store"
+          }
+        },
+        {
+          "name": "Get Vouchers by Customer ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers/customer/:customerId",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers", "customer", ":customerId"],
+              "variable": [
+                {
+                  "key": "customerId",
+                  "value": "{{user_id}}",
+                  "description": "Customer ID"
+                }
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active, redeemed, expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "-createdAt",
+                  "description": "Sort by field (prefix with - for descending)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results per page",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve all vouchers for a specific customer"
+          }
+        },
+        {
+          "name": "Create Voucher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"storeId\": \"{{store_id}}\",\n  \"productId\": \"{{product_id}}\",\n  \"customerId\": \"{{user_id}}\",\n  \"expirationDate\": \"2024-12-31T23:59:59.999Z\",\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers"]
+            },
+            "description": "Create a new voucher"
+          }
+        },
+        {
+          "name": "Update Voucher",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{user_id}}\",\n  \"status\": \"active\",\n  \"expirationDate\": \"2025-12-31T23:59:59.999Z\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{voucher_id}}",
+                  "description": "Voucher ID"
+                }
+              ]
+            },
+            "description": "Update an existing voucher"
+          }
+        },
+        {
+          "name": "Delete Voucher",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{voucher_id}}",
+                  "description": "Voucher ID"
+                }
+              ]
+            },
+            "description": "Delete a voucher"
+          }
+        },
+        {
+          "name": "Redeem Voucher",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/vouchers/code/:code/redeem",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "vouchers", "code", ":code", "redeem"],
+              "variable": [
+                {
+                  "key": "code",
+                  "value": "{{voucher_code}}",
+                  "description": "Voucher Code"
+                }
+              ]
+            },
+            "description": "Redeem a voucher by its code"
+          }
+        }
+      ]
     }
   ]
 } 
