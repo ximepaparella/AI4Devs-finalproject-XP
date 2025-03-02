@@ -1316,4 +1316,186 @@ npm run lint
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.
+
+## VoucherUsage Endpoints
+
+### Get All Voucher Usages
+- **URL**: `/voucher-usages`
+- **Method**: `GET`
+- **Query Parameters**:
+  - `voucherId`: Filter by voucher ID
+  - `storeId`: Filter by store ID
+  - `customerId`: Filter by customer ID
+  - `sort`: Sort field and order (e.g., `-usedAt` for descending order by usedAt)
+  - `limit`: Number of results per page (default: 10)
+  - `page`: Page number (default: 1)
+- **Access**: Private/Admin
+- **Description**: Retrieve all voucher usages with optional filtering, sorting, and pagination.
+- **Response**:
+  ```json
+  {
+    "voucherUsages": [
+      {
+        "_id": "60d21b4667d0d8992e610c85",
+        "voucherId": {
+          "_id": "60d21b4667d0d8992e610c80",
+          "code": "GIFT123",
+          "status": "redeemed"
+        },
+        "storeId": {
+          "_id": "60d21b4667d0d8992e610c81",
+          "name": "Store Name"
+        },
+        "customerId": {
+          "_id": "60d21b4667d0d8992e610c82",
+          "name": "John Doe",
+          "email": "john@example.com"
+        },
+        "usedAt": "2023-06-22T10:00:00.000Z"
+      }
+    ],
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1,
+    "totalResults": 1
+  }
+  ```
+
+### Get Voucher Usage by ID
+- **URL**: `/voucher-usages/:id`
+- **Method**: `GET`
+- **URL Parameters**:
+  - `id`: Voucher usage ID
+- **Access**: Private
+- **Description**: Retrieve a specific voucher usage by its ID.
+- **Response**:
+  ```json
+  {
+    "_id": "60d21b4667d0d8992e610c85",
+    "voucherId": {
+      "_id": "60d21b4667d0d8992e610c80",
+      "code": "GIFT123",
+      "status": "redeemed"
+    },
+    "storeId": {
+      "_id": "60d21b4667d0d8992e610c81",
+      "name": "Store Name"
+    },
+    "customerId": {
+      "_id": "60d21b4667d0d8992e610c82",
+      "name": "John Doe",
+      "email": "john@example.com"
+    },
+    "usedAt": "2023-06-22T10:00:00.000Z"
+  }
+  ```
+- **Error Codes**:
+  - `400`: Invalid voucher usage ID format
+  - `404`: Voucher usage not found
+  - `500`: Server error
+
+### Get Voucher Usage by Voucher ID
+- **URL**: `/voucher-usages/voucher/:voucherId`
+- **Method**: `GET`
+- **URL Parameters**:
+  - `voucherId`: Voucher ID
+- **Access**: Private
+- **Description**: Retrieve a voucher usage by the voucher ID.
+- **Response**: Same as "Get Voucher Usage by ID"
+- **Error Codes**:
+  - `400`: Invalid voucher ID format
+  - `404`: Voucher not found or Voucher usage not found
+  - `500`: Server error
+
+### Get Voucher Usages by Store ID
+- **URL**: `/voucher-usages/store/:storeId`
+- **Method**: `GET`
+- **URL Parameters**:
+  - `storeId`: Store ID
+- **Query Parameters**:
+  - `sort`: Sort field and order (e.g., `-usedAt` for descending order by usedAt)
+  - `limit`: Number of results per page (default: 10)
+  - `page`: Page number (default: 1)
+- **Access**: Private/StoreManager
+- **Description**: Retrieve all voucher usages for a specific store.
+- **Response**: Same as "Get All Voucher Usages"
+- **Error Codes**:
+  - `400`: Invalid store ID format
+  - `404`: Store not found
+  - `500`: Server error
+
+### Get Voucher Usages by Customer ID
+- **URL**: `/voucher-usages/customer/:customerId`
+- **Method**: `GET`
+- **URL Parameters**:
+  - `customerId`: Customer ID
+- **Query Parameters**:
+  - `sort`: Sort field and order (e.g., `-usedAt` for descending order by usedAt)
+  - `limit`: Number of results per page (default: 10)
+  - `page`: Page number (default: 1)
+- **Access**: Private
+- **Description**: Retrieve all voucher usages for a specific customer.
+- **Response**: Same as "Get All Voucher Usages"
+- **Error Codes**:
+  - `400`: Invalid customer ID format
+  - `404`: Customer not found
+  - `500`: Server error
+
+### Create Voucher Usage
+- **URL**: `/voucher-usages`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "voucherId": "60d21b4667d0d8992e610c80",
+    "storeId": "60d21b4667d0d8992e610c81",
+    "customerId": "60d21b4667d0d8992e610c82"
+  }
+  ```
+- **Access**: Private/StoreManager
+- **Description**: Create a new voucher usage record and mark the voucher as redeemed.
+- **Response**:
+  ```json
+  {
+    "_id": "60d21b4667d0d8992e610c85",
+    "voucherId": "60d21b4667d0d8992e610c80",
+    "storeId": "60d21b4667d0d8992e610c81",
+    "customerId": "60d21b4667d0d8992e610c82",
+    "usedAt": "2023-06-22T10:00:00.000Z"
+  }
+  ```
+- **Error Codes**:
+  - `400`: Missing required fields, Invalid ID format, Voucher is not active, Voucher has already been redeemed
+  - `404`: Voucher not found, Store not found, Customer not found
+  - `500`: Server error
+
+### Delete Voucher Usage
+- **URL**: `/voucher-usages/:id`
+- **Method**: `DELETE`
+- **URL Parameters**:
+  - `id`: Voucher usage ID
+- **Access**: Private/Admin
+- **Description**: Delete a voucher usage record and reactivate the associated voucher.
+- **Response**:
+  ```json
+  {
+    "message": "Voucher usage deleted successfully"
+  }
+  ```
+- **Error Codes**:
+  - `400`: Invalid voucher usage ID format
+  - `404`: Voucher usage not found
+  - `500`: Server error
+
+## VoucherUsage Data Model
+
+### Required Fields
+- `voucherId`: ObjectId (Reference to Voucher)
+- `storeId`: ObjectId (Reference to Store)
+- `customerId`: ObjectId (Reference to User)
+- `usedAt`: Date (Default: current date/time)
+
+### Indexes
+- `{ voucherId: 1 }`: Unique index to ensure each voucher is redeemed only once
+- `{ storeId: 1, customerId: 1 }`: Index for fetching redemption history for a user/store 

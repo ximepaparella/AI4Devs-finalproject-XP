@@ -9,6 +9,7 @@ import { storeRoutes } from './interfaces/routes/storeRoutes';
 import { productRoutes } from './interfaces/routes/productRoutes';
 import { voucherRoutes } from './interfaces/routes/voucherRoutes';
 import { orderRoutes } from './interfaces/routes/orderRoutes';
+import { voucherUsageRoutes } from './interfaces/routes/voucherUsageRoutes';
 // Import other routes as they are implemented
 // import { paymentRoutes } from './interfaces/routes/paymentRoutes';
 // import { redemptionRoutes } from './interfaces/routes/redemptionRoutes';
@@ -33,6 +34,7 @@ app.use('/api/stores', storeRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/vouchers', voucherRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/voucher-usages', voucherUsageRoutes);
 // Use other routes as they are implemented
 // app.use('/api/payments', paymentRoutes);
 // app.use('/api/redemptions', redemptionRoutes);

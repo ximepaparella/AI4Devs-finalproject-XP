@@ -944,6 +944,225 @@
           }
         }
       ]
+    },
+    {
+      "name": "Voucher Usages",
+      "item": [
+        {
+          "name": "Get All Voucher Usages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/voucher-usages?page=1&limit=10&sort=-usedAt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "voucher-usages"
+              ],
+              "query": [
+                {
+                  "key": "voucherId",
+                  "value": "{{voucherId}}",
+                  "description": "Filter by voucher ID",
+                  "disabled": true
+                },
+                {
+                  "key": "storeId",
+                  "value": "{{storeId}}",
+                  "description": "Filter by store ID",
+                  "disabled": true
+                },
+                {
+                  "key": "customerId",
+                  "value": "{{customerId}}",
+                  "description": "Filter by customer ID",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sort",
+                  "value": "-usedAt",
+                  "description": "Sort by usedAt in descending order"
+                }
+              ]
+            },
+            "description": "Retrieve all voucher usages with optional filtering, sorting, and pagination."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Voucher Usage by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/voucher-usages/{{voucherUsageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "voucher-usages",
+                "{{voucherUsageId}}"
+              ]
+            },
+            "description": "Retrieve a specific voucher usage by its ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Voucher Usage by Voucher ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/voucher-usages/voucher/{{voucherId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "voucher-usages",
+                "voucher",
+                "{{voucherId}}"
+              ]
+            },
+            "description": "Retrieve a voucher usage by the voucher ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Voucher Usages by Store ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/voucher-usages/store/{{storeId}}?page=1&limit=10&sort=-usedAt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "voucher-usages",
+                "store",
+                "{{storeId}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sort",
+                  "value": "-usedAt",
+                  "description": "Sort by usedAt in descending order"
+                }
+              ]
+            },
+            "description": "Retrieve all voucher usages for a specific store."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Voucher Usages by Customer ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/voucher-usages/customer/{{customerId}}?page=1&limit=10&sort=-usedAt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "voucher-usages",
+                "customer",
+                "{{customerId}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sort",
+                  "value": "-usedAt",
+                  "description": "Sort by usedAt in descending order"
+                }
+              ]
+            },
+            "description": "Retrieve all voucher usages for a specific customer."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Voucher Usage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"voucherId\": \"{{voucherId}}\",\n    \"storeId\": \"{{storeId}}\",\n    \"customerId\": \"{{customerId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/voucher-usages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "voucher-usages"
+              ]
+            },
+            "description": "Create a new voucher usage record."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Voucher Usage",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/voucher-usages/{{voucherUsageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "voucher-usages",
+                "{{voucherUsageId}}"
+              ]
+            },
+            "description": "Delete a voucher usage record and reactivate the associated voucher."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for managing voucher usage records."
     }
   ]
 } 
