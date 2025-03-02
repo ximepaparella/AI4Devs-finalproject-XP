@@ -24,11 +24,13 @@ export default function Login() {
       });
 
       if (result?.error) {
-        setError(result.error);
+        console.error('Login error:', result.error);
+        setError('Invalid email or password. Please try again.');
       } else {
         router.push('/dashboard');
       }
     } catch (err) {
+      console.error('Unexpected error during login:', err);
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);

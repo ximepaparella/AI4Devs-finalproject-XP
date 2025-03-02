@@ -6,8 +6,7 @@ import { register } from '@/services/auth';
 
 export default function Register() {
   const router = useRouter();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,8 +26,7 @@ export default function Register() {
 
     try {
       await register({
-        firstName,
-        lastName,
+        name,
         email,
         password,
       });
@@ -70,38 +68,20 @@ export default function Register() {
           )}
           
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
                   First name
                 </label>
                 <div className="mt-1">
                   <input
-                    id="firstName"
+                    id="name"
                     name="firstName"
                     type="text"
                     autoComplete="given-name"
                     required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  Last name
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    autoComplete="family-name"
-                    required
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>

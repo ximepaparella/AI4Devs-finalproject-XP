@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { User, IUser } from '../../domain/models/User';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 
 /**
  * Get all users
@@ -229,6 +230,82 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
       success: false,
       error: 'Server Error',
       message: error.message
+    });
+  }
+};
+
+/**
+ * User login
+ * @route POST /api/users/login
+ * @access Public
+ */
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, password } = req.body;
+
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        error: 'User not found',
+      });
+      return;
+    }
+
+    // Compare the password
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+      });
+      return;
+    }
+
+    // Check if JWT_SECRET is defined
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      res.status(500).json({
+        success: false,
+        error: 'Server configuration error',
+      });
+      return;
+    }
+
+    // Generate a JWT token
+    const userId = user._id ? user._id.toString() : '';
+    const userRole = user.role || 'customer';
+    
+    // Use a try-catch block to handle potential JWT signing errors
+    try {
+      const token = jwt.sign(
+        { id: userId, role: userRole },
+        jwtSecret
+      );
+
+      res.status(200).json({
+        success: true,
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
+    } catch (jwtError) {
+      console.error('JWT signing error:', jwtError);
+      res.status(500).json({
+        success: false,
+        error: 'Error generating authentication token',
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+      message: error.message,
     });
   }
 }; 

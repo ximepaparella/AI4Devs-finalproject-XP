@@ -18,19 +18,19 @@ export const authOptions: NextAuthOptions = {
         try {
           // Call your backend API for authentication
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/users/login`,
+            `${process.env.NEXT_PUBLIC_API_URL}/users/login`,
             {
               email: credentials.email,
               password: credentials.password,
             }
           );
 
-          if (response.data) {
+          if (response.data && response.data.success) {
             // Return the user object and token
             return {
               id: response.data.user.id,
               email: response.data.user.email,
-              name: `${response.data.user.firstName} ${response.data.user.lastName}`,
+              name: response.data.user.name,
               role: response.data.user.role,
               token: response.data.token,
             };

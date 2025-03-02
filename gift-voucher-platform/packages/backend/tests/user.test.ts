@@ -398,9 +398,10 @@ describe('User API', () => {
         .send(loginData);
 
       expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('success', true);
       expect(response.body).toHaveProperty('token');
       expect(response.body).toHaveProperty('user');
-      expect(response.body.user._id).toBe((user._id as mongoose.Types.ObjectId).toString());
+      expect(response.body.user.id).toBe(user._id.toString());
       expect(response.body.user.email).toBe(user.email);
       expect(response.body.user).not.toHaveProperty('password');
     });
@@ -416,8 +417,9 @@ describe('User API', () => {
         .send(loginData);
 
       expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('success', false);
       expect(response.body).toHaveProperty('error');
-      expect(response.body.error).toContain('not found');
+      expect(response.body.error).toContain('User not found');
     });
 
     it('should not login with invalid password', async () => {
@@ -433,9 +435,10 @@ describe('User API', () => {
         .post('/api/users/login')
         .send(loginData);
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('success', false);
       expect(response.body).toHaveProperty('error');
-      expect(response.body.error).toContain('not found');
+      expect(response.body.error).toContain('Invalid credentials');
     });
   });
 }); 

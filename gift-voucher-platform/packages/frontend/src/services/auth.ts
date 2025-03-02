@@ -30,7 +30,7 @@ export const login = async (credentials: LoginCredentials) => {
 export const register = async (data: RegisterData) => {
   try {
     // Register the user with the API
-    const response = await api.post('/api/users', {
+    const response = await api.post('/users', {
       ...data,
       role: 'customer', // Default role for new registrations
     });
