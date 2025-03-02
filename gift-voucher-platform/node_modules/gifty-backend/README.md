@@ -22,7 +22,7 @@ This is the backend API for the Gift Voucher Platform, a system for managing gif
    ```
 4. Create a `.env` file in the root directory with the following variables:
    ```
-   PORT=3001
+   PORT=3000
    NODE_ENV=development
    MONGO_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret_key
@@ -38,7 +38,7 @@ This is the backend API for the Gift Voucher Platform, a system for managing gif
 ### Base URL
 
 ```
-http://localhost:3001/api
+http://localhost:3000/api
 ```
 
 ### Authentication
@@ -220,6 +220,178 @@ Deletes a user.
     - 400 Bad Request - Invalid ID format
     - 404 Not Found - User not found
 
+### Store Endpoints
+
+#### Get All Stores
+
+Retrieves a list of all stores.
+
+- **URL**: `/stores`
+- **Method**: `GET`
+- **Access**: Public
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "count": 2,
+      "data": [
+        {
+          "_id": "60d21b4667d0d8992e610c87",
+          "name": "Example Store",
+          "ownerId": "60d21b4667d0d8992e610c85",
+          "email": "store@example.com",
+          "phone": "+1234567890",
+          "address": "123 Main St, City, Country",
+          "createdAt": "2023-06-22T19:12:38.657Z",
+          "updatedAt": "2023-06-22T19:12:38.657Z"
+        },
+        {
+          "_id": "60d21b4667d0d8992e610c88",
+          "name": "Another Store",
+          "ownerId": "60d21b4667d0d8992e610c86",
+          "email": "another.store@example.com",
+          "phone": "+0987654321",
+          "address": "456 Other St, City, Country",
+          "createdAt": "2023-06-22T19:12:38.657Z",
+          "updatedAt": "2023-06-22T19:12:38.657Z"
+        }
+      ]
+    }
+    ```
+
+#### Get Store by ID
+
+Retrieves a specific store by ID.
+
+- **URL**: `/stores/:id`
+- **Method**: `GET`
+- **URL Parameters**: 
+  - `id`: MongoDB ObjectId of the store
+- **Access**: Public
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "data": {
+        "_id": "60d21b4667d0d8992e610c87",
+        "name": "Example Store",
+        "ownerId": "60d21b4667d0d8992e610c85",
+        "email": "store@example.com",
+        "phone": "+1234567890",
+        "address": "123 Main St, City, Country",
+        "createdAt": "2023-06-22T19:12:38.657Z",
+        "updatedAt": "2023-06-22T19:12:38.657Z"
+      }
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Invalid ID format
+    - 404 Not Found - Store not found
+
+#### Create Store
+
+Creates a new store.
+
+- **URL**: `/stores`
+- **Method**: `POST`
+- **Access**: Private/StoreManager
+- **Request Body**:
+  ```json
+  {
+    "name": "Example Store",
+    "ownerId": "60d21b4667d0d8992e610c85",
+    "email": "store@example.com",
+    "phone": "+1234567890",
+    "address": "123 Main St, City, Country"
+  }
+  ```
+- **Response**:
+  - **Code**: 201 Created
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "data": {
+        "_id": "60d21b4667d0d8992e610c87",
+        "name": "Example Store",
+        "ownerId": "60d21b4667d0d8992e610c85",
+        "email": "store@example.com",
+        "phone": "+1234567890",
+        "address": "123 Main St, City, Country",
+        "createdAt": "2023-06-22T19:12:38.657Z",
+        "updatedAt": "2023-06-22T19:12:38.657Z"
+      }
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Validation error or email already exists
+
+#### Update Store
+
+Updates an existing store.
+
+- **URL**: `/stores/:id`
+- **Method**: `PUT`
+- **URL Parameters**: 
+  - `id`: MongoDB ObjectId of the store
+- **Access**: Private/StoreManager
+- **Request Body**:
+  ```json
+  {
+    "name": "Updated Store",
+    "email": "updated.store@example.com",
+    "phone": "+0987654321",
+    "address": "456 New St, City, Country"
+  }
+  ```
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "data": {
+        "_id": "60d21b4667d0d8992e610c87",
+        "name": "Updated Store",
+        "ownerId": "60d21b4667d0d8992e610c85",
+        "email": "updated.store@example.com",
+        "phone": "+0987654321",
+        "address": "456 New St, City, Country",
+        "createdAt": "2023-06-22T19:12:38.657Z",
+        "updatedAt": "2023-06-22T19:15:38.657Z"
+      }
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Invalid ID format, validation error, or email already in use
+    - 404 Not Found - Store not found
+
+#### Delete Store
+
+Deletes a store.
+
+- **URL**: `/stores/:id`
+- **Method**: `DELETE`
+- **URL Parameters**: 
+  - `id`: MongoDB ObjectId of the store
+- **Access**: Private/Admin
+- **Response**:
+  - **Code**: 200 OK
+  - **Content**:
+    ```json
+    {
+      "success": true,
+      "data": {}
+    }
+    ```
+  - **Error Codes**:
+    - 400 Bad Request - Invalid ID format
+    - 404 Not Found - Store not found
+
 ## Data Models
 
 ### User
@@ -230,6 +402,20 @@ Deletes a user.
   email: string;         // Required, unique, valid email format
   password: string;      // Required, min 8 characters (stored hashed)
   role: string;          // Required, enum: ['admin', 'store_manager', 'customer']
+  createdAt: Date;       // Automatically set
+  updatedAt: Date;       // Automatically updated
+}
+```
+
+### Store
+
+```typescript
+{
+  name: string;          // Required
+  ownerId: ObjectId;     // Required, reference to User
+  email: string;         // Required, unique, valid email format
+  phone: string;         // Required
+  address: string;       // Required
   createdAt: Date;       // Automatically set
   updatedAt: Date;       // Automatically updated
 }

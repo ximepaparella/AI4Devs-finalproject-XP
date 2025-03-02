@@ -15,10 +15,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3001/api/users",
+              "raw": "http://localhost:3000/api/users",
               "protocol": "http",
               "host": ["localhost"],
-              "port": "3001",
+              "port": "3000",
               "path": ["api", "users"]
             },
             "description": "Retrieve all users"
@@ -30,10 +30,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3001/api/users/:id",
+              "raw": "http://localhost:3000/api/users/:id",
               "protocol": "http",
               "host": ["localhost"],
-              "port": "3001",
+              "port": "3000",
               "path": ["api", "users", ":id"],
               "variable": [
                 {
@@ -61,10 +61,10 @@
               "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"customer\"\n}"
             },
             "url": {
-              "raw": "http://localhost:3001/api/users",
+              "raw": "http://localhost:3000/api/users",
               "protocol": "http",
               "host": ["localhost"],
-              "port": "3001",
+              "port": "3000",
               "path": ["api", "users"]
             },
             "description": "Create a new user"
@@ -85,10 +85,10 @@
               "raw": "{\n  \"name\": \"John Updated\",\n  \"email\": \"john.updated@example.com\",\n  \"role\": \"store_manager\"\n}"
             },
             "url": {
-              "raw": "http://localhost:3001/api/users/:id",
+              "raw": "http://localhost:3000/api/users/:id",
               "protocol": "http",
               "host": ["localhost"],
-              "port": "3001",
+              "port": "3000",
               "path": ["api", "users", ":id"],
               "variable": [
                 {
@@ -107,10 +107,10 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:3001/api/users/:id",
+              "raw": "http://localhost:3000/api/users/:id",
               "protocol": "http",
               "host": ["localhost"],
-              "port": "3001",
+              "port": "3000",
               "path": ["api", "users", ":id"],
               "variable": [
                 {
@@ -121,6 +121,126 @@
               ]
             },
             "description": "Delete a user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stores",
+      "description": "Store management endpoints",
+      "item": [
+        {
+          "name": "Get All Stores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/stores",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "stores"]
+            },
+            "description": "Retrieve all stores"
+          }
+        },
+        {
+          "name": "Get Store by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/stores/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "stores", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{store_id}}",
+                  "description": "Store ID"
+                }
+              ]
+            },
+            "description": "Retrieve a specific store by ID"
+          }
+        },
+        {
+          "name": "Create Store",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Example Store\",\n  \"ownerId\": \"{{user_id}}\",\n  \"email\": \"store@example.com\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Main St, City, Country\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/stores",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "stores"]
+            },
+            "description": "Create a new store"
+          }
+        },
+        {
+          "name": "Update Store",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Store\",\n  \"email\": \"updated.store@example.com\",\n  \"phone\": \"+0987654321\",\n  \"address\": \"456 New St, City, Country\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/stores/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "stores", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{store_id}}",
+                  "description": "Store ID"
+                }
+              ]
+            },
+            "description": "Update an existing store"
+          }
+        },
+        {
+          "name": "Delete Store",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/stores/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "stores", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{store_id}}",
+                  "description": "Store ID"
+                }
+              ]
+            },
+            "description": "Delete a store"
           }
         }
       ]

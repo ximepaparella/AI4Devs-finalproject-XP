@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 import { connectToDatabase } from './infrastructure/database/connection';
 import { errorHandler } from './interfaces/middlewares/errorHandler';
 import { userRoutes } from './interfaces/routes/userRoutes';
+import { storeRoutes } from './interfaces/routes/storeRoutes';
 import { voucherRoutes } from './interfaces/routes/voucherRoutes';
 import { orderRoutes } from './interfaces/routes/orderRoutes';
 import { paymentRoutes } from './interfaces/routes/paymentRoutes';
@@ -26,6 +27,7 @@ connectToDatabase();
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/stores', storeRoutes);
 app.use('/api/vouchers', voucherRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
