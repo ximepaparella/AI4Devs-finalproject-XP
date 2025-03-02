@@ -1,30 +1,27 @@
 import express from 'express';
+import { 
+  getAllUsers, 
+  getUserById, 
+  createUser, 
+  updateUser, 
+  deleteUser 
+} from '../../application/controllers/userController';
 
 const router = express.Router();
 
 // GET all users
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'Get all users - endpoint to be implemented' });
-});
+router.get('/', getAllUsers);
 
 // GET user by ID
-router.get('/:id', (req, res) => {
-  res.status(200).json({ message: `Get user with ID: ${req.params.id} - endpoint to be implemented` });
-});
+router.get('/:id', getUserById);
 
 // POST create new user
-router.post('/', (req, res) => {
-  res.status(201).json({ message: 'Create new user - endpoint to be implemented', data: req.body });
-});
+router.post('/', createUser);
 
 // PUT update user
-router.put('/:id', (req, res) => {
-  res.status(200).json({ message: `Update user with ID: ${req.params.id} - endpoint to be implemented`, data: req.body });
-});
+router.put('/:id', updateUser);
 
 // DELETE user
-router.delete('/:id', (req, res) => {
-  res.status(200).json({ message: `Delete user with ID: ${req.params.id} - endpoint to be implemented` });
-});
+router.delete('/:id', deleteUser);
 
 export { router as userRoutes }; 
