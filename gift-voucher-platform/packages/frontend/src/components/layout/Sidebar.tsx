@@ -1,20 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Layout from 'antd/lib/layout';
-import Menu from 'antd/lib/menu';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import {
-  DashboardOutlined,
-  ShoppingOutlined,
-  UserOutlined,
-  GiftOutlined,
-  ShopOutlined,
-  HistoryOutlined,
-  SettingOutlined,
-} from '@ant-design/icons/lib';
-import Link from 'next/link';
 
-const { Sider } = Layout;
+import Link from 'next/link';
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
@@ -43,36 +31,36 @@ const Sidebar: React.FC = () => {
   const adminItems = [
     {
       key: 'dashboard',
-      icon: <DashboardOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard">Dashboard</Link>,
     },
     {
       key: 'vouchers',
-      icon: <GiftOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard/vouchers">Vouchers</Link>,
     },
     {
       key: 'orders',
-      icon: <ShoppingOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard/orders">Orders</Link>,
     },
     {
       key: 'users',
-      icon: <UserOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard/users">Users</Link>,
       // Only show to admins
       hidden: !isAdmin,
     },
     {
       key: 'stores',
-      icon: <ShopOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard/stores">Stores</Link>,
       // Only show to admins
       hidden: !isAdmin,
     },
     {
       key: 'settings',
-      icon: <SettingOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard/settings">Settings</Link>,
     },
   ];
@@ -81,22 +69,22 @@ const Sidebar: React.FC = () => {
   const customerItems = [
     {
       key: 'dashboard',
-      icon: <DashboardOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard">Dashboard</Link>,
     },
     {
       key: 'my-vouchers',
-      icon: <GiftOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard/my-vouchers">My Vouchers</Link>,
     },
     {
       key: 'purchase-history',
-      icon: <HistoryOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard/purchase-history">Purchase History</Link>,
     },
     {
       key: 'settings',
-      icon: <SettingOutlined />,
+      icon: 'icon',
       label: <Link href="/dashboard/settings">Settings</Link>,
     },
   ];
@@ -105,28 +93,26 @@ const Sidebar: React.FC = () => {
   const menuItems = isCustomer ? customerItems : adminItems.filter(item => !item.hidden);
 
   return (
-    <Sider
-      collapsible
-      collapsed={collapsed}
-      onCollapse={setCollapsed}
-      width={250}
-      className="bg-white shadow-md"
-      breakpoint="lg"
-    >
+    <div className={`bg-white shadow-md ${collapsed ? 'w-16' : 'w-64'} transition-width duration-300`}>
       <div className="h-16 flex items-center justify-center">
         {!collapsed && (
           <div className="text-xl font-bold text-primary-600">
             {isAdmin ? 'Admin Panel' : isStoreManager ? 'Store Manager' : 'Customer Portal'}
           </div>
         )}
+        <button onClick={() => setCollapsed(!collapsed)} className="ml-2">
+          {collapsed ? '>' : '<'}
+        </button>
       </div>
-      <Menu
-        mode="inline"
-        selectedKeys={selectedKeys}
-        items={menuItems}
-        className="border-r-0"
-      />
-    </Sider>
+      <div className="flex flex-col">
+        {menuItems.map(item => (
+          <Link key={item.key} href={item.label.props.href} className={`flex items-center p-2 ${selectedKeys.includes(item.key) ? 'bg-gray-200' : ''}`}>
+            {item.icon}
+            <span className={`ml-2 ${collapsed ? 'hidden' : 'block'}`}>{item.label.props.children}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 };
 

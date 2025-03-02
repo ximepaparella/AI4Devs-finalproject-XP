@@ -1,11 +1,8 @@
 import React, { ReactNode } from 'react';
 import Head from 'next/head';
-import Layout from 'antd/lib/layout';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useSession } from 'next-auth/react';
-
-const { Content } = Layout;
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -31,21 +28,21 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <Layout style={{ minHeight: '100vh' }}>
+      <div className="min-h-screen flex flex-col">
         <Navbar />
         
-        <Layout>
+        <div className="flex flex-1">
           {showSidebar && isAuthenticated && <Sidebar />}
           
-          <Content style={{ padding: '24px', minHeight: 'calc(100vh - 64px)' }}>
+          <main className="flex-1 p-6 min-h-[calc(100vh-64px)]">
             <div className="container mx-auto">
               {children}
             </div>
-          </Content>
-        </Layout>
-      </Layout>
+          </main>
+        </div>
+      </div>
     </>
   );
 };
 
-export default MainLayout; 
+export default MainLayout;
