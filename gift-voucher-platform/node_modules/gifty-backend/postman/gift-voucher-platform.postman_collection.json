@@ -140,6 +140,104 @@
       ]
     },
     {
+      "name": "Dashboard",
+      "description": "Dashboard endpoints",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/dashboard/stats?limit=5",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "dashboard", "stats"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5",
+                  "description": "Number of recent vouchers to return"
+                }
+              ]
+            },
+            "description": "Get dashboard statistics and recent vouchers"
+          },
+          "response": [
+            {
+              "name": "Successful Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/api/dashboard/stats?limit=5",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["api", "dashboard", "stats"],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "5"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"totalProducts\": 10,\n    \"totalOrders\": 25,\n    \"activeVouchers\": 15,\n    \"redeemedVouchers\": 8,\n    \"expiredVouchers\": 2,\n    \"totalVoucherUsages\": 8,\n    \"recentVouchers\": [\n      {\n        \"id\": \"60d21b4667d0d8992e610c85\",\n        \"code\": \"GIFT123\",\n        \"productId\": \"60d21b4667d0d8992e610c86\",\n        \"productName\": \"Premium Gift Card\",\n        \"customerId\": \"60d21b4667d0d8992e610c87\",\n        \"customerName\": \"John Doe\",\n        \"storeId\": \"60d21b4667d0d8992e610c88\",\n        \"storeName\": \"Gift Store\",\n        \"status\": \"active\",\n        \"expirationDate\": \"2024-12-31T23:59:59.999Z\",\n        \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/dashboard/stats",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "3000",
+                  "path": ["api", "dashboard", "stats"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Not authorized to access this route\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Users",
       "description": "User management endpoints",
       "item": [

@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import Card from '@/components/ui/Card';
 
 export default function Home() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  // Redirect to dashboard if authenticated
+  useEffect(() => {
+    if (status === 'authenticated') {
+      console.log('User is authenticated, redirecting to dashboard');
+      router.push('/dashboard');
+    }
+  }, [status, router]);
+
+  // Show loading state while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Head>

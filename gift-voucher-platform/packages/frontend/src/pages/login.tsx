@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 
 export default function Login() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Get the callback URL from the query parameters or use dashboard as default
+  const callbackUrl = router.query.callbackUrl as string || '/dashboard';
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (status === 'authenticated') {
+      console.log('User is authenticated, redirecting to dashboard');
+      router.push('/dashboard');
+    }
+  }, [status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,17 +29,22 @@ export default function Login() {
     setLoading(true);
 
     try {
+      console.log('Attempting to sign in with credentials');
       const result = await signIn('credentials', {
         redirect: false,
         email,
         password,
+        callbackUrl,
       });
+
+      console.log('Sign in result:', result);
 
       if (result?.error) {
         console.error('Login error:', result.error);
         setError('Invalid email or password. Please try again.');
-      } else {
-        router.push('/dashboard');
+      } else if (result?.ok) {
+        console.log('Login successful, redirecting to:', callbackUrl);
+        router.push(callbackUrl);
       }
     } catch (err) {
       console.error('Unexpected error during login:', err);
@@ -36,6 +53,15 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  // Show loading state while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">

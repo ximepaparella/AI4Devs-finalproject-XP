@@ -16,14 +16,25 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          console.log('Attempting to authenticate with credentials:', {
+            email: credentials.email,
+            password: '********'
+          });
+
           // Call your backend API for authentication
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/login`,
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/users/login`,
             {
               email: credentials.email,
               password: credentials.password,
             }
           );
+
+          console.log('Authentication response:', {
+            success: response.data.success,
+            userId: response.data.user?.id,
+            userRole: response.data.user?.role
+          });
 
           if (response.data && response.data.success) {
             // Return the user object and token
@@ -32,7 +43,7 @@ export const authOptions: NextAuthOptions = {
               email: response.data.user.email,
               name: response.data.user.name,
               role: response.data.user.role,
-              token: response.data.token,
+              accessToken: response.data.token,
             };
           }
           return null;
@@ -44,20 +55,32 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      // Add user info to the token
+    async jwt({ token, user, account }) {
+      // Add user info to the token when signing in
       if (user) {
+        console.log('Adding user info to JWT token:', {
+          id: user.id,
+          role: user.role,
+          accessToken: user.accessToken
+        });
+
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.role = user.role;
-        token.accessToken = user.token;
+        token.accessToken = user.accessToken;
       }
       return token;
     },
     async session({ session, token }) {
-      // Add user info to the session
+      // Add user info and access token to the session
       if (token) {
+        console.log('Adding token info to session:', {
+          id: token.id,
+          role: token.role,
+          hasAccessToken: !!token.accessToken
+        });
+
         session.user = {
           id: token.id as string,
           email: token.email as string,
