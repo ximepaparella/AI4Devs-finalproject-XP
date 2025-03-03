@@ -17,6 +17,12 @@ router.get('/', getAllOrders);
 // GET orders by customer ID
 router.get('/customer/:customerId', getOrdersByCustomerId);
 
+// GET voucher by code
+router.get('/voucher/:code', getVoucherByCode);
+
+// PUT redeem voucher by code
+router.put('/voucher/:code/redeem', redeemVoucher);
+
 // GET order by ID
 router.get('/:id', getOrderById);
 
@@ -28,11 +34,5 @@ router.put('/:id', updateOrder);
 
 // DELETE order
 router.delete('/:id', deleteOrder);
-
-// GET voucher by code
-router.get('/voucher/:code', getVoucherByCode);
-
-// PUT redeem voucher by code
-router.put('/voucher/:code/redeem', redeemVoucher);
 
 export { router as orderRoutes }; 

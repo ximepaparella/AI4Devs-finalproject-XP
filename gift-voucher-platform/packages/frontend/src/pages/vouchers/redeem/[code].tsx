@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -19,38 +19,68 @@ const VoucherRedeemPage: NextPage = () => {
   const { currentVoucher, loading, error, getVoucherByCode, redeemVoucher } = useVouchers();
   const [redeemStatus, setRedeemStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [redeemMessage, setRedeemMessage] = useState<string>('');
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  const fetchAttempted = useRef(false);
 
   useEffect(() => {
     const fetchVoucher = async () => {
-      if (!code || typeof code !== 'string') return;
-      await getVoucherByCode(code);
+      if (!code || typeof code !== 'string') {
+        setDebugInfo(`Invalid code: ${JSON.stringify(code)}`);
+        return;
+      }
+      
+      // Skip if we've already attempted to fetch this voucher
+      if (fetchAttempted.current) {
+        setDebugInfo(prev => `${prev}\nSkipping duplicate fetch attempt`);
+        return;
+      }
+      
+      fetchAttempted.current = true;
+      setDebugInfo(`Attempting to fetch voucher with code: ${code}`);
+      
+      try {
+        await getVoucherByCode(code);
+        setDebugInfo(prev => `${prev}\nVoucher fetch completed`);
+      } catch (err) {
+        setDebugInfo(prev => `${prev}\nError in fetchVoucher: ${err}`);
+      }
     };
 
     if (router.isReady) {
+      setDebugInfo(`Router is ready, code: ${code}`);
       fetchVoucher();
+    } else {
+      setDebugInfo('Router not ready yet');
     }
   }, [code, router.isReady, getVoucherByCode]);
 
   const handleRedeemVoucher = async () => {
-    if (!code || typeof code !== 'string') return;
+    if (!code || typeof code !== 'string') {
+      setDebugInfo(prev => `${prev}\nInvalid code for redemption: ${JSON.stringify(code)}`);
+      return;
+    }
 
     try {
       setRedeemStatus('loading');
       setRedeemMessage('');
+      setDebugInfo(prev => `${prev}\nAttempting to redeem voucher with code: ${code}`);
       
       const result = await redeemVoucher(code);
       
       if (result) {
         setRedeemStatus('success');
         setRedeemMessage('Voucher has been successfully redeemed!');
+        setDebugInfo(prev => `${prev}\nVoucher successfully redeemed`);
       } else {
         setRedeemStatus('error');
         setRedeemMessage('Failed to redeem voucher. It may have already been redeemed or expired.');
+        setDebugInfo(prev => `${prev}\nFailed to redeem voucher`);
       }
     } catch (error: any) {
       console.error('Error redeeming voucher:', error);
       setRedeemStatus('error');
       setRedeemMessage(error.response?.data?.message || 'An error occurred while redeeming the voucher');
+      setDebugInfo(prev => `${prev}\nError in handleRedeemVoucher: ${error.message}`);
     }
   };
 
@@ -85,6 +115,7 @@ const VoucherRedeemPage: NextPage = () => {
         </Head>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
         <p className="text-gray-600">Loading voucher information...</p>
+      
       </div>
     );
   }
@@ -98,16 +129,14 @@ const VoucherRedeemPage: NextPage = () => {
         </Head>
         <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
           <div className="flex items-center justify-center mb-6">
-            <div className="rounded-full bg-red-100 p-3">
-              <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
+            <svg className="h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Voucher Error</h1>
+          <h1 className="text-xl font-bold text-center text-gray-800 mb-4">Error Loading Voucher</h1>
           <p className="text-center text-gray-600 mb-6">{error}</p>
           <div className="flex justify-center">
-            <Link href="/" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <Link href="/" className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
               Return Home
             </Link>
           </div>
