@@ -6,12 +6,11 @@ import { errorHandler } from './interfaces/middlewares/errorHandler';
 import { userRoutes } from './interfaces/routes/userRoutes';
 import { storeRoutes } from './interfaces/routes/storeRoutes';
 import { productRoutes } from './interfaces/routes/productRoutes';
-// import { voucherRoutes } from './interfaces/routes/voucherRoutes'; // Removed in favor of unified flow
 import { orderRoutes } from './interfaces/routes/orderRoutes';
 import { voucherUsageRoutes } from './interfaces/routes/voucherUsageRoutes';
 import { dashboardRoutes } from './interfaces/routes/dashboardRoutes';
 // Import other routes as they are implemented
-// import { paymentRoutes } from './interfaces/routes/paymentRoutes';
+import { paymentRoutes } from './interfaces/routes/paymentRoutes';
 // import { redemptionRoutes } from './interfaces/routes/redemptionRoutes';
 
 // Load environment variables
@@ -32,12 +31,11 @@ connectToDatabase();
 app.use('/api/users', userRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/products', productRoutes);
-// app.use('/api/vouchers', voucherRoutes); // Removed in favor of unified flow
 app.use('/api/orders', orderRoutes);
 app.use('/api/voucher-usages', voucherUsageRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 // Use other routes as they are implemented
-// app.use('/api/payments', paymentRoutes);
+app.use('/api/payments', paymentRoutes);
 // app.use('/api/redemptions', redemptionRoutes);
 
 // Error handling middleware

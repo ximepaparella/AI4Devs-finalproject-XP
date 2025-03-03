@@ -45,7 +45,7 @@ const OrderSchema = new Schema<IOrder>(
     paymentDetails: {
       paymentId: { 
         type: String, 
-        required: [true, 'Payment ID is required'] 
+        required: false
       },
       paymentStatus: { 
         type: String, 

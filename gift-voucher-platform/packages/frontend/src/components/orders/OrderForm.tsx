@@ -4,6 +4,7 @@ import { Order, CreateOrderData } from '@/hooks/useOrders';
 import api from '@/services/api';
 import VoucherPreview from '../vouchers/VoucherPreview';
 import { useVouchers } from '@/hooks/useVouchers';
+import { OrderPaymentProcessor } from '../payments';
 
 interface User {
   _id: string;
@@ -71,6 +72,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({
   const [isRedeeming, setIsRedeeming] = useState(false);
   const [redemptionError, setRedemptionError] = useState<string | null>(null);
   const [redemptionSuccess, setRedemptionSuccess] = useState<string | null>(null);
+
+  // Always show payment processor for new orders
+  const [showPaymentProcessor, setShowPaymentProcessor] = useState(!initialData);
+  const [formDataForPayment, setFormDataForPayment] = useState<Omit<CreateOrderData, 'paymentDetails'> | null>(null);
 
   const {
     register,
@@ -301,22 +306,54 @@ export const OrderForm: React.FC<OrderFormProps> = ({
     setValue('voucher.template', template);
   };
 
-  const handleFormSubmit = async (data: CreateOrderData) => {
-    try {
-      // Ensure amount is a number
-      const formattedData = {
-        ...data,
-        paymentDetails: {
-          ...data.paymentDetails,
-          amount: Number(data.paymentDetails.amount)
-        }
-      };
-
-      console.log('Submitting unified order data:', formattedData);
-      await onSubmit(formattedData);
-    } catch (error) {
-      console.error('Error in form submission:', error);
+  const handleFormSubmit = (data: any) => {
+    // If we're editing an existing order, submit directly
+    if (initialData) {
+      onSubmit(data);
+      return;
     }
+    
+    // Check for all required fields
+    if (!data.customerId || 
+        !data.voucher?.storeId || 
+        !data.voucher?.productId ||
+        !data.voucher?.sender_name ||
+        !data.voucher?.sender_email ||
+        !data.voucher?.receiver_name ||
+        !data.voucher?.receiver_email ||
+        !data.voucher?.message) {
+      alert("Please fill in all required fields");
+      return;
+    }
+    
+    // For new orders, prepare data for payment processing
+    const formattedData: Omit<CreateOrderData, 'paymentDetails'> = {
+      customerId: data.customerId,
+      voucher: {
+        productId: data.voucher.productId,
+        storeId: data.voucher.storeId,
+        template: data.voucher.template || 'template1',
+        message: data.voucher.message,
+        sender_name: data.voucher.sender_name,
+        sender_email: data.voucher.sender_email,
+        receiver_name: data.voucher.receiver_name,
+        receiver_email: data.voucher.receiver_email,
+        expirationDate: data.voucher.expirationDate || new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0]
+      }
+    };
+    
+    setFormDataForPayment(formattedData);
+  };
+
+  const handlePaymentComplete = (orderId: string, paymentDetails: any) => {
+    // Show success message and redirect or update UI
+    alert(`Payment completed successfully! Order ID: ${orderId}`);
+    window.location.href = `/orders/${orderId}`;
+  };
+
+  const handlePaymentError = (error: string) => {
+    alert(`Payment error: ${error}`);
+    setShowPaymentProcessor(false);
   };
 
   // Add a function to handle voucher redemption
@@ -367,6 +404,49 @@ export const OrderForm: React.FC<OrderFormProps> = ({
       setIsRedeeming(false);
     }
   };
+
+  // Function to get current form data for payment
+  const getCurrentFormData = () => {
+    const formValues = watch();
+    
+    // Check for all required fields
+    if (!formValues.customerId || 
+        !formValues.voucher?.storeId || 
+        !formValues.voucher?.productId ||
+        !formValues.voucher?.sender_name ||
+        !formValues.voucher?.sender_email ||
+        !formValues.voucher?.receiver_name ||
+        !formValues.voucher?.receiver_email ||
+        !formValues.voucher?.message) {
+      return null;
+    }
+    
+    return {
+      customerId: formValues.customerId,
+      voucher: {
+        productId: formValues.voucher.productId,
+        storeId: formValues.voucher.storeId,
+        template: formValues.voucher.template || 'template1',
+        message: formValues.voucher.message,
+        sender_name: formValues.voucher.sender_name,
+        sender_email: formValues.voucher.sender_email,
+        receiver_name: formValues.voucher.receiver_name,
+        receiver_email: formValues.voucher.receiver_email,
+        expirationDate: formValues.voucher.expirationDate || new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0]
+      }
+    };
+  };
+
+  // Update form data for payment whenever form values change
+  useEffect(() => {
+    if (!initialData) {
+      setFormDataForPayment(getCurrentFormData());
+    }
+  }, [watch('customerId'), watch('voucher.storeId'), watch('voucher.productId'), 
+      watch('voucher.template'), watch('voucher.message'), 
+      watch('voucher.sender_name'), watch('voucher.sender_email'),
+      watch('voucher.receiver_name'), watch('voucher.receiver_email'),
+      watch('voucher.expirationDate')]);
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
@@ -490,124 +570,159 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             </div>
           </div>
 
-          {/* Payment Details */}
-          <div className="space-y-4">
-            <h4 className="text-md font-medium text-gray-800">Payment Details</h4>
-
-            {/* Payment ID */}
-            <div>
-              <label htmlFor="paymentDetails.paymentId" className="block text-sm font-medium text-gray-700">
-                Payment ID
-              </label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  id="paymentDetails.paymentId"
-                  {...register('paymentDetails.paymentId', { required: 'Payment ID is required' })}
-                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Enter payment ID"
+          {/* Replace Payment Details section with OrderPaymentProcessor when needed */}
+          {!initialData && (
+            <div className="mt-6">
+              <h4 className="text-md font-medium text-gray-800">Payment</h4>
+              {formDataForPayment && formDataForPayment.customerId && 
+               formDataForPayment.voucher.productId && 
+               formDataForPayment.voucher.storeId &&
+               formDataForPayment.voucher.sender_name &&
+               formDataForPayment.voucher.sender_email &&
+               formDataForPayment.voucher.receiver_name &&
+               formDataForPayment.voucher.receiver_email &&
+               formDataForPayment.voucher.message ? (
+                <OrderPaymentProcessor 
+                  formData={formDataForPayment}
+                  onPaymentComplete={handlePaymentComplete}
+                  onPaymentError={handlePaymentError}
                 />
-                {errors.paymentDetails?.paymentId && (
-                  <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.paymentId.message}</p>
-                )}
-              </div>
+              ) : (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-sm text-yellow-700">
+                    Please fill in all required fields to enable payment:
+                  </p>
+                  <ul className="list-disc ml-5 mt-2 text-sm text-yellow-700">
+                    {!watch('customerId') && <li>Customer</li>}
+                    {!watch('voucher.storeId') && <li>Store</li>}
+                    {!watch('voucher.productId') && <li>Product</li>}
+                    {!watch('voucher.sender_name') && <li>Sender Name</li>}
+                    {!watch('voucher.sender_email') && <li>Sender Email</li>}
+                    {!watch('voucher.receiver_name') && <li>Recipient Name</li>}
+                    {!watch('voucher.receiver_email') && <li>Recipient Email</li>}
+                    {!watch('voucher.message') && <li>Message</li>}
+                  </ul>
+                </div>
+              )}
             </div>
+          )}
+          
+          {initialData && (
+            <>
+              {/* Payment Details - Only show for editing existing orders */}
+              <div className="space-y-4">
+                <h4 className="text-md font-medium text-gray-800">Payment Details</h4>
 
-            {/* Payment Status */}
-            <div>
-              <label htmlFor="paymentDetails.paymentStatus" className="block text-sm font-medium text-gray-700">
-                Payment Status
-              </label>
-              <div className="mt-1">
-                <select
-                  id="paymentDetails.paymentStatus"
-                  {...register('paymentDetails.paymentStatus', { required: 'Payment status is required' })}
-                  className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="completed">Completed</option>
-                  <option value="failed">Failed</option>
-                </select>
-                {errors.paymentDetails?.paymentStatus && (
-                  <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.paymentStatus.message}</p>
-                )}
-              </div>
-            </div>
+                {/* Payment ID */}
+                <div>
+                  <label htmlFor="paymentDetails.paymentId" className="block text-sm font-medium text-gray-700">
+                    Payment ID
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="paymentDetails.paymentId"
+                      {...register('paymentDetails.paymentId', { required: 'Payment ID is required' })}
+                      className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Enter payment ID"
+                    />
+                    {errors.paymentDetails?.paymentId && (
+                      <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.paymentId.message}</p>
+                    )}
+                  </div>
+                </div>
 
-            {/* Payment Email */}
-            <div>
-              <label htmlFor="paymentDetails.paymentEmail" className="block text-sm font-medium text-gray-700">
-                Payment Email
-              </label>
-              <div className="mt-1">
-                <input
-                  type="email"
-                  id="paymentDetails.paymentEmail"
-                  {...register('paymentDetails.paymentEmail', {
-                    required: 'Payment email is required',
-                    pattern: {
-                      value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                      message: 'Please enter a valid email address'
-                    }
-                  })}
-                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Enter payment email"
-                />
-                {errors.paymentDetails?.paymentEmail && (
-                  <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.paymentEmail.message}</p>
-                )}
-              </div>
-            </div>
+                {/* Payment Status */}
+                <div>
+                  <label htmlFor="paymentDetails.paymentStatus" className="block text-sm font-medium text-gray-700">
+                    Payment Status
+                  </label>
+                  <div className="mt-1">
+                    <select
+                      id="paymentDetails.paymentStatus"
+                      {...register('paymentDetails.paymentStatus', { required: 'Payment status is required' })}
+                      className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="completed">Completed</option>
+                      <option value="failed">Failed</option>
+                    </select>
+                    {errors.paymentDetails?.paymentStatus && (
+                      <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.paymentStatus.message}</p>
+                    )}
+                  </div>
+                </div>
 
-            {/* Payment Amount */}
-            <div>
-              <label htmlFor="paymentDetails.amount" className="block text-sm font-medium text-gray-700">
-                Amount
-              </label>
-              <div className="mt-1">
-                <input
-                  type="number"
-                  id="paymentDetails.amount"
-                  {...register('paymentDetails.amount', {
-                    required: 'Amount is required',
-                    min: {
-                      value: 0.01,
-                      message: 'Amount must be greater than 0'
-                    }
-                  })}
-                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50"
-                  placeholder="Enter amount"
-                  step="0.01"
-                  disabled={true}
-                />
-                {errors.paymentDetails?.amount && (
-                  <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.amount.message}</p>
-                )}
-                <p className="mt-1 text-xs text-gray-500">Amount is automatically set based on the selected product</p>
-              </div>
-            </div>
+                {/* Payment Email */}
+                <div>
+                  <label htmlFor="paymentDetails.paymentEmail" className="block text-sm font-medium text-gray-700">
+                    Payment Email
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="email"
+                      id="paymentDetails.paymentEmail"
+                      {...register('paymentDetails.paymentEmail', {
+                        required: 'Payment email is required',
+                        pattern: {
+                          value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                          message: 'Please enter a valid email address'
+                        }
+                      })}
+                      className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Enter payment email"
+                    />
+                    {errors.paymentDetails?.paymentEmail && (
+                      <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.paymentEmail.message}</p>
+                    )}
+                  </div>
+                </div>
 
-            {/* Payment Provider */}
-            <div>
-              <label htmlFor="paymentDetails.provider" className="block text-sm font-medium text-gray-700">
-                Payment Provider
-              </label>
-              <div className="mt-1">
-                <select
-                  id="paymentDetails.provider"
-                  {...register('paymentDetails.provider', { required: 'Payment provider is required' })}
-                  className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
-                  <option value="mercadopago">Mercado Pago</option>
-                  <option value="paypal">PayPal</option>
-                  <option value="stripe">Stripe</option>
-                </select>
-                {errors.paymentDetails?.provider && (
-                  <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.provider.message}</p>
-                )}
+                {/* Payment Amount */}
+                <div>
+                  <label htmlFor="paymentDetails.amount" className="block text-sm font-medium text-gray-700">
+                    Payment Amount
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="number"
+                      id="paymentDetails.amount"
+                      {...register('paymentDetails.amount', {
+                        required: 'Payment amount is required',
+                        min: { value: 0, message: 'Amount must be greater than 0' }
+                      })}
+                      className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Enter payment amount"
+                      step="0.01"
+                    />
+                    {errors.paymentDetails?.amount && (
+                      <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.amount.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Payment Provider */}
+                <div>
+                  <label htmlFor="paymentDetails.provider" className="block text-sm font-medium text-gray-700">
+                    Payment Provider
+                  </label>
+                  <div className="mt-1">
+                    <select
+                      id="paymentDetails.provider"
+                      {...register('paymentDetails.provider', { required: 'Payment provider is required' })}
+                      className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    >
+                      <option value="mercadopago">Mercado Pago</option>
+                      <option value="manual">Manual</option>
+                    </select>
+                    {errors.paymentDetails?.provider && (
+                      <p className="mt-1 text-sm text-red-600">{errors.paymentDetails.provider.message}</p>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
          {/* QR Code Display for Edit Mode */}
@@ -900,25 +1015,28 @@ export const OrderForm: React.FC<OrderFormProps> = ({
        
       </div>
 
-      {/* Submit Button */}
-      <div className="pt-5">
+      {/* Submit Button - Only show for editing existing orders */}
+      {initialData && (
         <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => reset()}
-            className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Reset
-          </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Processing...' : initialData ? 'Update Order' : 'Create Order'}
+            {isLoading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </>
+            ) : 'Update Order'}
           </button>
         </div>
-      </div>
+      )}
     </form>
   );
-}; 
+};
+
+export default OrderForm; 

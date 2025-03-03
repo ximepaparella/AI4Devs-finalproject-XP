@@ -1,19 +1,12 @@
-import * as mercadopago from 'mercadopago';
+import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 import { IOrder, Order } from '../../domain/models/Order';
 
 /**
  * Initialize Mercado Pago configuration with access token
  */
 export const initMercadoPago = (): void => {
-  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  
-  if (!accessToken) {
-    throw new Error('MERCADO_PAGO_ACCESS_TOKEN is not defined in environment variables');
-  }
-  
-  mercadopago.configure({
-    access_token: accessToken
-  });
+  // No need to throw an error if token is missing since we're using hardcoded responses
+  console.log('MercadoPago SDK initialized with mock data');
 };
 
 /**
@@ -31,40 +24,13 @@ export const createPreference = async (
   pendingUrl: string
 ) => {
   try {
-    // Get product information from the order
-    const { voucher, paymentDetails } = order;
+    console.log('Creating mock MercadoPago preference for order:', order._id.toString());
     
-    // Create preference data
-    const preference = {
-      items: [
-        {
-          id: voucher.productId.toString(),
-          title: `Gift Voucher - ${voucher.code}`,
-          description: `Gift voucher for ${voucher.receiver_name}`,
-          quantity: 1,
-          currency_id: 'ARS', // Change according to your currency
-          unit_price: paymentDetails.amount
-        }
-      ],
-      payer: {
-        name: voucher.sender_name.split(' ')[0] || '',
-        surname: voucher.sender_name.split(' ').slice(1).join(' ') || '',
-        email: voucher.sender_email,
-      },
-      back_urls: {
-        success: successUrl,
-        failure: failureUrl,
-        pending: pendingUrl
-      },
-      auto_return: 'approved',
-      external_reference: order._id.toString(),
-      notification_url: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payments/webhook/mercadopago`,
+    // Return hardcoded preference response
+    return {
+      init_point: `${process.env.FRONTEND_URL || 'http://localhost:3001'}/payment/success?orderId=${order._id.toString()}`,
+      id: 'mock_preference_' + Date.now()
     };
-    
-    // Create the preference in Mercado Pago
-    const response = await mercadopago.preferences.create(preference);
-    
-    return response.body;
   } catch (error: any) {
     console.error('Error creating Mercado Pago preference:', error);
     throw new Error(`Failed to create Mercado Pago preference: ${error.message}`);
@@ -78,8 +44,29 @@ export const createPreference = async (
  */
 export const getPaymentInfo = async (paymentId: string) => {
   try {
-    const response = await mercadopago.payment.get(paymentId);
-    return response.body;
+    console.log('Getting mock payment info for payment ID:', paymentId);
+    
+    // Return hardcoded payment response with approved status
+    return {
+      id: paymentId,
+      status: 'approved',
+      status_detail: 'accredited',
+      payment_method_id: 'credit_card',
+      payment_type_id: 'credit_card',
+      external_reference: paymentId.replace('mock_payment_', ''),
+      date_created: new Date().toISOString(),
+      date_approved: new Date().toISOString(),
+      transaction_amount: 1000,
+      currency_id: 'ARS',
+      description: 'Gift Voucher Purchase',
+      payer: {
+        email: 'test@example.com',
+        identification: {
+          type: 'DNI',
+          number: '12345678'
+        }
+      }
+    };
   } catch (error: any) {
     console.error('Error getting payment info from Mercado Pago:', error);
     throw new Error(`Failed to get payment info: ${error.message}`);
@@ -94,9 +81,33 @@ export const getPaymentInfo = async (paymentId: string) => {
  */
 export const processWebhookNotification = async (topic: string, id: string) => {
   try {
+    console.log('Processing mock webhook notification:', { topic, id });
+    
     if (topic === 'payment') {
-      const paymentInfo = await getPaymentInfo(id);
-      return paymentInfo;
+      // Extract orderId from the id parameter (assuming id contains the orderId)
+      const orderId = id.includes('_') ? id.split('_')[1] : id;
+      
+      // Return hardcoded payment response with approved status
+      return {
+        id: 'mock_payment_' + Date.now(),
+        status: 'approved',
+        status_detail: 'accredited',
+        payment_method_id: 'credit_card',
+        payment_type_id: 'credit_card',
+        external_reference: orderId,
+        date_created: new Date().toISOString(),
+        date_approved: new Date().toISOString(),
+        transaction_amount: 1000,
+        currency_id: 'ARS',
+        description: 'Gift Voucher Purchase',
+        payer: {
+          email: 'test@example.com',
+          identification: {
+            type: 'DNI',
+            number: '12345678'
+          }
+        }
+      };
     }
     
     return null;

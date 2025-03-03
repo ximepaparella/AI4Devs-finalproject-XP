@@ -62,16 +62,18 @@ const PaymentFailurePage: React.FC = () => {
             
             <div className="mt-6 flex flex-col space-y-2">
               {orderId && (
-                <Link href={`/payment/checkout?orderId=${orderId}`}>
-                  <a className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                    Try Again
-                  </a>
+                <Link 
+                  href={`/payment/checkout?orderId=${orderId}`}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Try Again
                 </Link>
               )}
-              <Link href="/">
-                <a className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                  Return to Home
-                </a>
+              <Link 
+                href="/"
+                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Return to Home
               </Link>
             </div>
           </div>
