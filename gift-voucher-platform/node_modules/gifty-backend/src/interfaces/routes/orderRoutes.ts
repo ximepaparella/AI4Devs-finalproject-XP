@@ -5,7 +5,9 @@ import {
   getOrdersByCustomerId,
   createOrder,
   updateOrder,
-  deleteOrder
+  deleteOrder,
+  resendVoucherEmails,
+  downloadVoucherPDF
 } from '../../application/controllers/orderController';
 import { getVoucherByCode, redeemVoucher } from '../../application/controllers/voucherController';
 
@@ -34,5 +36,11 @@ router.put('/:id', updateOrder);
 
 // DELETE order
 router.delete('/:id', deleteOrder);
+
+// POST resend voucher emails
+router.post('/:id/resend-emails', resendVoucherEmails);
+
+// GET download voucher PDF
+router.get('/:id/download-pdf', downloadVoucherPDF);
 
 export { router as orderRoutes }; 

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Order } from '@/hooks/useOrders';
 import VoucherPreviewModal from '../ui/VoucherPreviewModal';
+import { toast } from 'react-hot-toast';
+import api from '@/services/api';
 
 interface OrdersTableProps {
   orders: Order[];
@@ -16,6 +18,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
 }) => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [isResending, setIsResending] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this order?')) {
@@ -31,6 +34,24 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
   const closePreviewModal = () => {
     setIsPreviewModalOpen(false);
     setSelectedOrder(null);
+  };
+
+  const handleResendEmails = async (orderId: string) => {
+    try {
+      setIsResending(orderId);
+      await api.post(`/orders/${orderId}/resend-emails`);
+      toast.success('Voucher emails resent successfully');
+    } catch (error) {
+      console.error('Error resending emails:', error);
+      toast.error('Failed to resend emails');
+    } finally {
+      setIsResending(null);
+    }
+  };
+
+  const handleDownloadPDF = (orderId: string) => {
+    // Open the download URL in a new tab
+    window.open(`${api.defaults.baseURL}/orders/${orderId}/download-pdf`, '_blank');
   };
 
   const formatDate = (dateString: string) => {
@@ -138,6 +159,23 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
                   >
                     Preview
                   </button>
+                  {order.paymentDetails.paymentStatus === 'completed' && (
+                    <>
+                      <button
+                        onClick={() => handleResendEmails(order._id)}
+                        disabled={isResending === order._id}
+                        className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
+                      >
+                        {isResending === order._id ? 'Sending...' : 'Resend Email'}
+                      </button>
+                      <button
+                        onClick={() => handleDownloadPDF(order._id)}
+                        className="text-purple-600 hover:text-purple-900"
+                      >
+                        Download PDF
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => handleDelete(order._id)}
                     className="text-red-600 hover:text-red-900"

@@ -6,6 +6,8 @@ import {
   getPaymentInfo, 
   processWebhookNotification 
 } from '../../infrastructure/services/mercadoPagoService';
+import { generateVoucherPDF } from '../../infrastructure/services/pdfService';
+import { sendAllVoucherEmails } from '../../infrastructure/services/emailService';
 
 // Initialize Mercado Pago when the controller is loaded
 try {
@@ -130,6 +132,28 @@ export const handleMercadoPagoWebhook = async (req: Request, res: Response): Pro
     });
     
     console.log(`Order ${order._id} payment status updated to ${paymentStatus}`);
+
+    // If payment is completed, generate PDF and send emails
+    if (paymentStatus === 'completed') {
+      try {
+        // Get the updated order
+        const updatedOrder = await Order.findById(order._id);
+        if (!updatedOrder) {
+          throw new Error('Updated order not found');
+        }
+
+        // Generate PDF
+        const pdfPath = await generateVoucherPDF(updatedOrder);
+
+        // Send emails
+        await sendAllVoucherEmails(updatedOrder, pdfPath);
+
+        console.log(`Voucher PDF generated and emails sent for order: ${order._id}`);
+      } catch (emailError: any) {
+        console.error('Error sending voucher emails:', emailError);
+        // Don't fail the webhook response if email sending fails
+      }
+    }
     
     res.status(200).json({ success: true });
   } catch (error: any) {
@@ -158,60 +182,14 @@ export const getPaymentStatus = async (req: Request, res: Response): Promise<voi
       return;
     }
     
-    // If the order doesn't have payment details yet, return pending status
-    if (!order.paymentDetails) {
-      res.status(200).json({
-        success: true,
-        data: {
-          paymentStatus: 'pending'
-        }
-      });
-      return;
-    }
-    
-    // If the order has a payment ID and provider is Mercado Pago, get the latest status
-    if (order.paymentDetails.paymentId && order.paymentDetails.provider === 'mercadopago') {
-      try {
-        // Get mock payment info (always approved)
-        const paymentResponse = await getPaymentInfo(order.paymentDetails.paymentId);
-        
-        // Always set to completed for mock data
-        const paymentStatus = 'completed';
-        
-        // Update the order if status has changed
-        if (paymentStatus !== order.paymentDetails.paymentStatus) {
-          await Order.findByIdAndUpdate(orderId, {
-            'paymentDetails.paymentStatus': paymentStatus
-          });
-          
-          console.log(`Order ${orderId} payment status updated to ${paymentStatus}`);
-        }
-        
-        res.status(200).json({
-          success: true,
-          data: {
-            paymentStatus,
-            paymentDetails: paymentResponse
-          }
-        });
-      } catch (error) {
-        // If there's an error getting payment info, return the current status
-        res.status(200).json({
-          success: true,
-          data: {
-            paymentStatus: order.paymentDetails.paymentStatus
-          }
-        });
+    res.status(200).json({
+      success: true,
+      data: {
+        paymentStatus: order.paymentDetails.paymentStatus,
+        paymentId: order.paymentDetails.paymentId || null,
+        provider: order.paymentDetails.provider
       }
-    } else {
-      // If no payment ID or not Mercado Pago, return the current status
-      res.status(200).json({
-        success: true,
-        data: {
-          paymentStatus: order.paymentDetails.paymentStatus
-        }
-      });
-    }
+    });
   } catch (error: any) {
     console.error('Error getting payment status:', error);
     res.status(500).json({

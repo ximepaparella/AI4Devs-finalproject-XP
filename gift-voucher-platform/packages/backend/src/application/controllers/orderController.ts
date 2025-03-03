@@ -6,6 +6,10 @@ import { Product } from '../../domain/models/Product';
 import mongoose from 'mongoose';
 import crypto from 'crypto';
 import QRCode from 'qrcode';
+import { generateVoucherPDF } from '../../infrastructure/services/pdfService';
+import { sendAllVoucherEmails } from '../../infrastructure/services/emailService';
+import path from 'path';
+import fs from 'fs';
 
 /**
  * Generate a unique voucher code
@@ -438,6 +442,173 @@ export const deleteOrder = async (req: Request, res: Response): Promise<void> =>
       success: false,
       error: 'Server Error',
       message: error.message
+    });
+  }
+};
+
+/**
+ * Resend voucher emails
+ * @route POST /api/orders/:id/resend-emails
+ * @access Private
+ */
+export const resendVoucherEmails = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    console.log(`Attempting to resend emails for order: ${id}`);
+    
+    // Find the order
+    const order = await Order.findById(id);
+    if (!order) {
+      console.log(`Order not found: ${id}`);
+      res.status(404).json({
+        success: false,
+        error: 'Order not found'
+      });
+      return;
+    }
+    
+    console.log(`Order found: ${order._id}, payment status: ${order.paymentDetails.paymentStatus}`);
+    
+    // Check if payment is completed
+    if (order.paymentDetails.paymentStatus !== 'completed') {
+      console.log(`Cannot resend emails for order with incomplete payment: ${id}`);
+      res.status(400).json({
+        success: false,
+        error: 'Cannot resend emails for orders with incomplete payment'
+      });
+      return;
+    }
+    
+    try {
+      // Generate PDF
+      console.log(`Generating PDF for order: ${id}`);
+      const pdfPath = await generateVoucherPDF(order);
+      console.log(`PDF generated successfully at: ${pdfPath}`);
+      
+      // Send emails
+      console.log(`Sending emails for order: ${id}`);
+      await sendAllVoucherEmails(order, pdfPath);
+      console.log(`Emails sent successfully for order: ${id}`);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Voucher emails resent successfully'
+      });
+    } catch (innerError: any) {
+      console.error(`Error in PDF generation or email sending: ${innerError.message}`);
+      console.error(innerError.stack);
+      
+      // Return a more specific error message
+      res.status(500).json({
+        success: false,
+        error: 'Error in PDF generation or email sending',
+        message: innerError.message,
+        stack: process.env.NODE_ENV === 'development' ? innerError.stack : undefined
+      });
+    }
+  } catch (error: any) {
+    console.error(`Error resending voucher emails: ${error.message}`);
+    console.error(error.stack);
+    
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
+/**
+ * Download voucher PDF
+ * @route GET /api/orders/:id/download-pdf
+ * @access Private
+ */
+export const downloadVoucherPDF = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    console.log(`Attempting to download PDF for order: ${id}`);
+    
+    // Find the order
+    const order = await Order.findById(id);
+    if (!order) {
+      console.log(`Order not found: ${id}`);
+      res.status(404).json({
+        success: false,
+        error: 'Order not found'
+      });
+      return;
+    }
+    
+    console.log(`Order found: ${order._id}, payment status: ${order.paymentDetails.paymentStatus}`);
+    
+    // Check if payment is completed
+    if (order.paymentDetails.paymentStatus !== 'completed') {
+      console.log(`Cannot download PDF for order with incomplete payment: ${id}`);
+      res.status(400).json({
+        success: false,
+        error: 'Cannot download PDF for orders with incomplete payment'
+      });
+      return;
+    }
+    
+    try {
+      // Generate PDF
+      console.log(`Generating PDF for order: ${id}`);
+      const pdfPath = await generateVoucherPDF(order);
+      console.log(`PDF generated successfully at: ${pdfPath}`);
+      
+      // Check if file exists
+      if (!fs.existsSync(pdfPath)) {
+        console.error(`PDF file not found at path: ${pdfPath}`);
+        res.status(500).json({
+          success: false,
+          error: 'PDF file not found'
+        });
+        return;
+      }
+      
+      // Set headers for file download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=voucher-${order.voucher.code}.pdf`);
+      
+      // Send the file
+      const absolutePath = path.resolve(pdfPath);
+      console.log(`Sending file from absolute path: ${absolutePath}`);
+      
+      fs.readFile(absolutePath, (err, data) => {
+        if (err) {
+          console.error(`Error reading PDF file: ${err.message}`);
+          res.status(500).json({
+            success: false,
+            error: 'Error reading PDF file',
+            message: err.message
+          });
+          return;
+        }
+        
+        res.send(data);
+      });
+    } catch (innerError: any) {
+      console.error(`Error in PDF generation: ${innerError.message}`);
+      console.error(innerError.stack);
+      
+      res.status(500).json({
+        success: false,
+        error: 'Error generating PDF',
+        message: innerError.message,
+        stack: process.env.NODE_ENV === 'development' ? innerError.stack : undefined
+      });
+    }
+  } catch (error: any) {
+    console.error(`Error downloading voucher PDF: ${error.message}`);
+    console.error(error.stack);
+    
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }; 
