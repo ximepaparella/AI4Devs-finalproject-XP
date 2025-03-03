@@ -27,8 +27,9 @@ const generateVoucherCode = (): string => {
  */
 const generateQRCode = async (voucherCode: string): Promise<string> => {
   try {
-    // Generate QR code as base64 string
-    return await QRCode.toDataURL(voucherCode);
+    // Generate QR code with the full redemption URL
+    const redemptionUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/vouchers/redeem/${voucherCode}`;
+    return await QRCode.toDataURL(redemptionUrl);
   } catch (error) {
     throw new Error('Failed to generate QR code');
   }
