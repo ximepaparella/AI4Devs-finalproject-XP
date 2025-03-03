@@ -27,9 +27,7 @@ export default function DashboardLayout({ children, title = 'Dashboard' }: Dashb
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Head>
-        <title>{title} - Gifty</title>
-      </Head>
+
 
       {/* Sidebar for desktop */}
       <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">

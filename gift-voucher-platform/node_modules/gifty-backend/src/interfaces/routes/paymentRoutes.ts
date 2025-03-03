@@ -1,4 +1,9 @@
 import express from 'express';
+import {
+  createMercadoPagoCheckout,
+  handleMercadoPagoWebhook,
+  getPaymentStatus
+} from '../../application/controllers/paymentController';
 
 const router = express.Router();
 
@@ -26,5 +31,15 @@ router.put('/:id/status', (req, res) => {
 router.get('/methods', (req, res) => {
   res.status(200).json({ message: 'Get payment methods - endpoint to be implemented' });
 });
+
+// Mercado Pago routes
+// POST create Mercado Pago checkout for an order
+router.post('/mercadopago/create/:orderId', createMercadoPagoCheckout);
+
+// POST handle Mercado Pago webhook notifications
+router.post('/webhook/mercadopago', handleMercadoPagoWebhook);
+
+// GET payment status for an order
+router.get('/status/:orderId', getPaymentStatus);
 
 export { router as paymentRoutes }; 

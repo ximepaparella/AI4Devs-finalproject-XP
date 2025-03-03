@@ -92,8 +92,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({
       voucher: {
         storeId: initialData.voucher.storeId,
         productId: initialData.voucher.productId,
-        expirationDate: initialData.voucher.expirationDate && typeof initialData.voucher.expirationDate === 'string' 
-          ? initialData.voucher.expirationDate.split('T')[0] 
+        expirationDate: initialData.voucher.expirationDate && typeof initialData.voucher.expirationDate === 'string'
+          ? initialData.voucher.expirationDate.split('T')[0]
           : new Date().toISOString().split('T')[0],
         sender_name: initialData.voucher.sender_name,
         sender_email: initialData.voucher.sender_email,
@@ -135,7 +135,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
           ? new Date(value.voucher.expirationDate).toLocaleDateString()
           : ''
       }));
-      
+
       // Update store name if store changes
       if (value.voucher?.storeId) {
         const store = stores.find(s => s._id === value.voucher?.storeId);
@@ -147,7 +147,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
         }
       }
     });
-    
+
     return () => subscription.unsubscribe();
   }, [watch, stores]);
 
@@ -161,7 +161,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
           ...prev,
           productName: product.name
         }));
-        
+
         // Update the payment amount based on product price
         setValue('paymentDetails.amount', product.price);
       }
@@ -173,7 +173,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
     if (selectedStoreId) {
       const filtered = products.filter(product => product.storeId === selectedStoreId);
       setFilteredProducts(filtered);
-      
+
       // Clear product selection if the current product doesn't belong to the selected store
       const currentProductId = formValues.voucher?.productId;
       if (currentProductId) {
@@ -202,7 +202,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             setCustomerError('No customers found. Please create a customer user first.');
           }
           setCustomers(customerUsers);
-          
+
           // If in edit mode, update preview with customer name
           if (initialData) {
             const customer = customerUsers.find((c: User) => c._id === initialData.customerId);
@@ -232,7 +232,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             setStoreError('No stores found. Please create a store first.');
           }
           setStores(response.data.data);
-          
+
           // If in edit mode, update preview with store name
           if (initialData) {
             const store = response.data.data.find((s: Store) => s._id === initialData.voucher.storeId);
@@ -262,7 +262,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             setProductError('No products found. Please create products first.');
           }
           setProducts(response.data.data);
-          
+
           // If in edit mode, update preview with product name and filter products by store
           if (initialData) {
             const product = response.data.data.find((p: Product) => p._id === initialData.voucher.productId);
@@ -271,7 +271,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 ...prev,
                 productName: product.name
               }));
-              
+
               // Also filter products by the store
               const filtered = response.data.data.filter(
                 (p: Product) => p.storeId === initialData.voucher.storeId
@@ -311,7 +311,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
           amount: Number(data.paymentDetails.amount)
         }
       };
-      
+
       console.log('Submitting unified order data:', formattedData);
       await onSubmit(formattedData);
     } catch (error) {
@@ -322,23 +322,23 @@ export const OrderForm: React.FC<OrderFormProps> = ({
   // Add a function to handle voucher redemption
   const handleRedeemVoucher = async () => {
     if (!initialData || !initialData.voucher.code) return;
-    
+
     try {
       setIsRedeeming(true);
       setRedemptionError(null);
       setRedemptionSuccess(null);
-      
+
       const result = await redeemVoucher(initialData.voucher.code);
-      
+
       if (result) {
         setRedemptionSuccess('Voucher has been successfully redeemed!');
-        
+
         // Update preview data to reflect the change
         setPreviewData(prev => ({
           ...prev,
           status: 'redeemed'
         }));
-        
+
         // Refresh the order data after redemption
         if (initialData._id) {
           try {
@@ -371,10 +371,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Column - Order Details */}
+        {/*Order Details */}
         <div className="space-y-6">
           <h3 className="text-lg font-medium text-gray-900">Order Information</h3>
-          
+
           {/* Customer Selection */}
           <div>
             <label htmlFor="customerId" className="block text-sm font-medium text-gray-700">
@@ -383,8 +383,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             <div className="mt-1">
               {initialData ? (
                 <div className="block w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded-md shadow-sm text-gray-700">
-                  {loadingCustomers ? 'Loading customer information...' : 
-                    customers.find(c => c._id === initialData.customerId)?.name || 
+                  {loadingCustomers ? 'Loading customer information...' :
+                    customers.find(c => c._id === initialData.customerId)?.name ||
                     `Customer ID: ${initialData.customerId}`}
                 </div>
               ) : (
@@ -411,10 +411,89 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             </div>
           </div>
 
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            {/* Store Selection */}
+            <div>
+              <label htmlFor="voucher.storeId" className="block text-sm font-medium text-gray-700">
+                Store
+              </label>
+              <div className="mt-1">
+                {initialData ? (
+                  <div className="block w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded-md shadow-sm text-gray-700">
+                    {loadingStores ? 'Loading store information...' :
+                      stores.find(s => s._id === initialData.voucher.storeId)?.name ||
+                      `Store ID: ${initialData.voucher.storeId}`}
+                  </div>
+                ) : (
+                  <select
+                    id="voucher.storeId"
+                    {...register('voucher.storeId', { required: 'Store is required' })}
+                    className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    disabled={loadingStores}
+                  >
+                    <option value="">Select a store</option>
+                    {stores.map((store) => (
+                      <option key={store._id} value={store._id}>
+                        {store.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {errors.voucher?.storeId && (
+                  <p className="mt-1 text-sm text-red-600">{errors.voucher.storeId.message}</p>
+                )}
+                {storeError && (
+                  <p className="mt-1 text-sm text-red-600">{storeError}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Product Selection */}
+            <div>
+              <label htmlFor="voucher.productId" className="block text-sm font-medium text-gray-700">
+                Product
+              </label>
+              <div className="mt-1">
+                {initialData ? (
+                  <div className="block w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded-md shadow-sm text-gray-700">
+                    {loadingProducts ? 'Loading product information...' :
+                      products.find(p => p._id === initialData.voucher.productId)?.name ||
+                      `Product ID: ${initialData.voucher.productId}`}
+                  </div>
+                ) : (
+                  <select
+                    id="voucher.productId"
+                    {...register('voucher.productId', { required: 'Product is required' })}
+                    className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    disabled={loadingProducts || !selectedStoreId}
+                  >
+                    <option value="">Select a product</option>
+                    {filteredProducts.map((product) => (
+                      <option key={product._id} value={product._id}>
+                        {product.name} (${product.price.toFixed(2)})
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {errors.voucher?.productId && (
+                  <p className="mt-1 text-sm text-red-600">{errors.voucher.productId.message}</p>
+                )}
+                {productError && (
+                  <p className="mt-1 text-sm text-red-600">{productError}</p>
+                )}
+                {!selectedStoreId && !initialData && (
+                  <p className="mt-1 text-sm text-amber-600">Please select a store first</p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Payment Details */}
           <div className="space-y-4">
             <h4 className="text-md font-medium text-gray-800">Payment Details</h4>
-            
+
             {/* Payment ID */}
             <div>
               <label htmlFor="paymentDetails.paymentId" className="block text-sm font-medium text-gray-700">
@@ -433,7 +512,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 )}
               </div>
             </div>
-            
+
             {/* Payment Status */}
             <div>
               <label htmlFor="paymentDetails.paymentStatus" className="block text-sm font-medium text-gray-700">
@@ -454,7 +533,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 )}
               </div>
             </div>
-            
+
             {/* Payment Email */}
             <div>
               <label htmlFor="paymentDetails.paymentEmail" className="block text-sm font-medium text-gray-700">
@@ -464,7 +543,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 <input
                   type="email"
                   id="paymentDetails.paymentEmail"
-                  {...register('paymentDetails.paymentEmail', { 
+                  {...register('paymentDetails.paymentEmail', {
                     required: 'Payment email is required',
                     pattern: {
                       value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
@@ -479,7 +558,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 )}
               </div>
             </div>
-            
+
             {/* Payment Amount */}
             <div>
               <label htmlFor="paymentDetails.amount" className="block text-sm font-medium text-gray-700">
@@ -489,7 +568,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 <input
                   type="number"
                   id="paymentDetails.amount"
-                  {...register('paymentDetails.amount', { 
+                  {...register('paymentDetails.amount', {
                     required: 'Amount is required',
                     min: {
                       value: 0.01,
@@ -507,7 +586,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 <p className="mt-1 text-xs text-gray-500">Amount is automatically set based on the selected product</p>
               </div>
             </div>
-            
+
             {/* Payment Provider */}
             <div>
               <label htmlFor="paymentDetails.provider" className="block text-sm font-medium text-gray-700">
@@ -530,338 +609,297 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             </div>
           </div>
         </div>
-        
-        {/* Right Column - Voucher Details */}
-        <div className="space-y-6">
-          <h3 className="text-lg font-medium text-gray-900">Voucher Information</h3>
-          
-          {/* Store Selection */}
-          <div>
-            <label htmlFor="voucher.storeId" className="block text-sm font-medium text-gray-700">
-              Store
-            </label>
-            <div className="mt-1">
-              {initialData ? (
-                <div className="block w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded-md shadow-sm text-gray-700">
-                  {loadingStores ? 'Loading store information...' : 
-                    stores.find(s => s._id === initialData.voucher.storeId)?.name || 
-                    `Store ID: ${initialData.voucher.storeId}`}
-                </div>
-              ) : (
-                <select
-                  id="voucher.storeId"
-                  {...register('voucher.storeId', { required: 'Store is required' })}
-                  className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  disabled={loadingStores}
-                >
-                  <option value="">Select a store</option>
-                  {stores.map((store) => (
-                    <option key={store._id} value={store._id}>
-                      {store.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {errors.voucher?.storeId && (
-                <p className="mt-1 text-sm text-red-600">{errors.voucher.storeId.message}</p>
-              )}
-              {storeError && (
-                <p className="mt-1 text-sm text-red-600">{storeError}</p>
-              )}
-            </div>
-          </div>
-          
-          {/* Product Selection */}
-          <div>
-            <label htmlFor="voucher.productId" className="block text-sm font-medium text-gray-700">
-              Product
-            </label>
-            <div className="mt-1">
-              {initialData ? (
-                <div className="block w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded-md shadow-sm text-gray-700">
-                  {loadingProducts ? 'Loading product information...' : 
-                    products.find(p => p._id === initialData.voucher.productId)?.name || 
-                    `Product ID: ${initialData.voucher.productId}`}
-                </div>
-              ) : (
-                <select
-                  id="voucher.productId"
-                  {...register('voucher.productId', { required: 'Product is required' })}
-                  className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  disabled={loadingProducts || !selectedStoreId}
-                >
-                  <option value="">Select a product</option>
-                  {filteredProducts.map((product) => (
-                    <option key={product._id} value={product._id}>
-                      {product.name} (${product.price.toFixed(2)})
-                    </option>
-                  ))}
-                </select>
-              )}
-              {errors.voucher?.productId && (
-                <p className="mt-1 text-sm text-red-600">{errors.voucher.productId.message}</p>
-              )}
-              {productError && (
-                <p className="mt-1 text-sm text-red-600">{productError}</p>
-              )}
-              {!selectedStoreId && !initialData && (
-                <p className="mt-1 text-sm text-amber-600">Please select a store first</p>
-              )}
-            </div>
-          </div>
-          
-          {/* Expiration Date */}
-          <div>
-            <label htmlFor="voucher.expirationDate" className="block text-sm font-medium text-gray-700">
-              Expiration Date
-            </label>
-            <div className="mt-1">
-              <input
-                type="date"
-                id="voucher.expirationDate"
-                {...register('voucher.expirationDate', { required: 'Expiration date is required' })}
-                className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                min={new Date().toISOString().split('T')[0]}
-              />
-              {errors.voucher?.expirationDate && (
-                <p className="mt-1 text-sm text-red-600">{errors.voucher.expirationDate.message}</p>
-              )}
-            </div>
-          </div>
-          
-          {/* Sender Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="voucher.sender_name" className="block text-sm font-medium text-gray-700">
-                Sender Name
-              </label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  id="voucher.sender_name"
-                  {...register('voucher.sender_name', { required: 'Sender name is required' })}
-                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Enter sender name"
-                />
-                {errors.voucher?.sender_name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.voucher.sender_name.message}</p>
-                )}
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="voucher.sender_email" className="block text-sm font-medium text-gray-700">
-                Sender Email
-              </label>
-              <div className="mt-1">
-                <input
-                  type="email"
-                  id="voucher.sender_email"
-                  {...register('voucher.sender_email', { 
-                    required: 'Sender email is required',
-                    pattern: {
-                      value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                      message: 'Please enter a valid email address'
-                    }
-                  })}
-                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Enter sender email"
-                />
-                {errors.voucher?.sender_email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.voucher.sender_email.message}</p>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          {/* Recipient Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="voucher.receiver_name" className="block text-sm font-medium text-gray-700">
-                Recipient Name
-              </label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  id="voucher.receiver_name"
-                  {...register('voucher.receiver_name', { required: 'Recipient name is required' })}
-                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Enter recipient name"
-                />
-                {errors.voucher?.receiver_name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.voucher.receiver_name.message}</p>
-                )}
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="voucher.receiver_email" className="block text-sm font-medium text-gray-700">
-                Recipient Email
-              </label>
-              <div className="mt-1">
-                <input
-                  type="email"
-                  id="voucher.receiver_email"
-                  {...register('voucher.receiver_email', { 
-                    required: 'Recipient email is required',
-                    pattern: {
-                      value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                      message: 'Please enter a valid email address'
-                    }
-                  })}
-                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Enter recipient email"
-                />
-                {errors.voucher?.receiver_email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.voucher.receiver_email.message}</p>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          {/* Message */}
-          <div>
-            <label htmlFor="voucher.message" className="block text-sm font-medium text-gray-700">
-              Message
-            </label>
-            <div className="mt-1">
-              <textarea
-                id="voucher.message"
-                {...register('voucher.message', { 
-                  required: 'Message is required',
-                  maxLength: {
-                    value: 500,
-                    message: 'Message cannot be more than 500 characters'
-                  }
-                })}
-                rows={3}
-                className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Enter a personal message for the recipient"
-              />
-              {errors.voucher?.message && (
-                <p className="mt-1 text-sm text-red-600">
-                  {typeof errors.voucher.message === 'string' 
-                    ? errors.voucher.message 
-                    : errors.voucher.message.message}
-                </p>
-              )}
-            </div>
-          </div>
-          
-          {/* Template Selection */}
-          <div>
-            <label htmlFor="voucher.template" className="block text-sm font-medium text-gray-700">
-              Voucher Template
-            </label>
-            <div className="mt-1">
-              <select
-                id="voucher.template"
-                {...register('voucher.template', { required: 'Template is required' })}
-                className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                onChange={handleTemplateChange}
-              >
-                <option value="template1">Classic</option>
-                <option value="template2">Modern</option>
-                <option value="template3">Elegant</option>
-                <option value="template4">Festive</option>
-                <option value="template5">Minimalist</option>
-              </select>
-              {errors.voucher?.template && (
-                <p className="mt-1 text-sm text-red-600">{errors.voucher.template.message}</p>
-              )}
-            </div>
-          </div>
-        </div>
+
+         {/* QR Code Display for Edit Mode */}
+         <div className="mt-6 border-t border-gray-200 pt-6">
+           {initialData && initialData.voucher.qrCode ? (
+             <div className="flex flex-col items-center max-w-md mx-auto">
+               <div className="mb-4">
+                 <img
+                   src={initialData.voucher.qrCode}
+                   alt="Voucher QR Code"
+                   className="w-48 h-48 border rounded-md"
+                 />
+               </div>
+
+               <p className="text-sm text-gray-600 mb-4 text-center">
+                 Scan this QR code to access the redemption page
+               </p>
+
+               <div className="text-center mb-6">
+                 <p className="text-lg font-bold">{initialData.voucher.code}</p>
+               </div>
+
+               <div className="w-full mb-4">
+                 <p className="text-sm font-medium text-gray-700 mb-2">Redemption Link:</p>
+                 <div className="flex">
+                   <input
+                     type="text"
+                     readOnly
+                     value={`${window.location.origin}/vouchers/redeem/${initialData.voucher.code}`}
+                     className="flex-1 py-2 px-3 border border-gray-300 bg-gray-50 rounded-l-md text-sm"
+                   />
+                   <button
+                     type="button"
+                     onClick={() => {
+                       navigator.clipboard.writeText(`${window.location.origin}/vouchers/redeem/${initialData.voucher.code}`);
+                       alert('Link copied to clipboard!');
+                     }}
+                     className="py-2 px-4 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                   >
+                     Copy
+                   </button>
+                 </div>
+                 <p className="text-xs text-gray-500 mt-1">
+                   The QR code contains this link. Share it or let customers scan the QR code to redeem the voucher.
+                 </p>
+               </div>
+
+               {redemptionSuccess && (
+                 <div className="mb-4 w-full bg-green-50 p-3 rounded-md">
+                   <p className="text-sm text-green-700">{redemptionSuccess}</p>
+                 </div>
+               )}
+
+               {redemptionError && (
+                 <div className="mb-4 w-full bg-red-50 p-3 rounded-md">
+                   <p className="text-sm text-red-700">{redemptionError}</p>
+                 </div>
+               )}
+
+               <div className="w-full">
+                 <button
+                   type="button"
+                   onClick={handleRedeemVoucher}
+                   disabled={isRedeeming || initialData.voucher.status !== 'active'}
+                   className={`w-full py-2 px-4 rounded-md text-white font-medium ${initialData.voucher.status === 'active'
+                       ? 'bg-blue-600 hover:bg-blue-700'
+                       : 'bg-gray-400 cursor-not-allowed'
+                     }`}
+                 >
+                   {isRedeeming
+                     ? 'Processing...'
+                     : initialData.voucher.status === 'active'
+                       ? 'Redeem Voucher'
+                       : 'Voucher Already Redeemed'}
+                 </button>
+               </div>
+             </div>
+           ) : (
+             <div className="flex flex-col items-center max-w-md mx-auto">
+               <div className="w-48 h-48 border rounded-md bg-gray-200 animate-pulse mb-4"></div>
+               <p className="text-sm text-gray-600 mb-4 text-center">Loading voucher information...</p>
+               <div className="w-full mb-4">
+                 <p className="text-sm font-medium text-gray-700 mb-2">Redemption Link:</p>
+                 <div className="flex">
+                   <input
+                     type="text"
+                     readOnly
+                     value="Loading..."
+                     className="flex-1 py-2 px-3 border border-gray-300 bg-gray-50 rounded-l-md text-sm"
+                   />
+                   <button
+                     type="button"
+                     disabled
+                     className="py-2 px-4 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-sm font-medium text-gray-700 cursor-not-allowed"
+                   >
+                     Copy
+                   </button>
+                 </div>
+                 <p className="text-xs text-gray-500 mt-1">
+                   The QR code contains this link. Share it or let customers scan the QR code to redeem the voucher.
+                 </p>
+               </div>
+             </div>
+           )}
+         </div>
+
+
       </div>
-      
+
       {/* Voucher Preview */}
       <div className="mt-8 border-t border-gray-200 pt-8">
-        <h3 className="text-lg font-medium text-gray-900">Voucher Preview</h3>
-        <div className="mt-4">
-          <VoucherPreview previewData={previewData} />
-        </div>
-        
-        {/* QR Code Display for Edit Mode */}
-        {initialData && initialData.voucher.qrCode && (
-          <div className="mt-6 border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Voucher QR Code</h3>
-            <div className="flex flex-col items-center max-w-md mx-auto">
-              <div className="mb-4">
-                <img 
-                  src={initialData.voucher.qrCode} 
-                  alt="Voucher QR Code" 
-                  className="w-48 h-48 border rounded-md"
-                />
-              </div>
-              
-              <p className="text-sm text-gray-600 mb-4 text-center">
-                Scan this QR code to access the redemption page
-              </p>
-              
-              <div className="text-center mb-6">
-                <p className="text-lg font-bold">{initialData.voucher.code}</p>
-              </div>
-              
-              <div className="w-full mb-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Redemption Link:</p>
-                <div className="flex">
+
+        {/* Voucher Details */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-medium text-gray-900">Voucher Information</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <section>
+              {/* Expiration Date */}
+              <div>
+                <label htmlFor="voucher.expirationDate" className="block text-sm font-medium text-gray-700">
+                  Expiration Date
+                </label>
+                <div className="mt-1">
                   <input
-                    type="text"
-                    readOnly
-                    value={`${window.location.origin}/vouchers/redeem/${initialData.voucher.code}`}
-                    className="flex-1 py-2 px-3 border border-gray-300 bg-gray-50 rounded-l-md text-sm"
+                    type="date"
+                    id="voucher.expirationDate"
+                    {...register('voucher.expirationDate', { required: 'Expiration date is required' })}
+                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    min={new Date().toISOString().split('T')[0]}
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(`${window.location.origin}/vouchers/redeem/${initialData.voucher.code}`);
-                      alert('Link copied to clipboard!');
-                    }}
-                    className="py-2 px-4 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                  {errors.voucher?.expirationDate && (
+                    <p className="mt-1 text-sm text-red-600">{errors.voucher.expirationDate.message}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Sender Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="voucher.sender_name" className="block text-sm font-medium text-gray-700">
+                    Sender Name
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="voucher.sender_name"
+                      {...register('voucher.sender_name', { required: 'Sender name is required' })}
+                      className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Enter sender name"
+                    />
+                    {errors.voucher?.sender_name && (
+                      <p className="mt-1 text-sm text-red-600">{errors.voucher.sender_name.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="voucher.sender_email" className="block text-sm font-medium text-gray-700">
+                    Sender Email
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="email"
+                      id="voucher.sender_email"
+                      {...register('voucher.sender_email', {
+                        required: 'Sender email is required',
+                        pattern: {
+                          value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                          message: 'Please enter a valid email address'
+                        }
+                      })}
+                      className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Enter sender email"
+                    />
+                    {errors.voucher?.sender_email && (
+                      <p className="mt-1 text-sm text-red-600">{errors.voucher.sender_email.message}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Recipient Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="voucher.receiver_name" className="block text-sm font-medium text-gray-700">
+                    Recipient Name
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="voucher.receiver_name"
+                      {...register('voucher.receiver_name', { required: 'Recipient name is required' })}
+                      className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Enter recipient name"
+                    />
+                    {errors.voucher?.receiver_name && (
+                      <p className="mt-1 text-sm text-red-600">{errors.voucher.receiver_name.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="voucher.receiver_email" className="block text-sm font-medium text-gray-700">
+                    Recipient Email
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="email"
+                      id="voucher.receiver_email"
+                      {...register('voucher.receiver_email', {
+                        required: 'Recipient email is required',
+                        pattern: {
+                          value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                          message: 'Please enter a valid email address'
+                        }
+                      })}
+                      className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Enter recipient email"
+                    />
+                    {errors.voucher?.receiver_email && (
+                      <p className="mt-1 text-sm text-red-600">{errors.voucher.receiver_email.message}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Message */}
+              <div>
+                <label htmlFor="voucher.message" className="block text-sm font-medium text-gray-700">
+                  Message
+                </label>
+                <div className="mt-1">
+                  <textarea
+                    id="voucher.message"
+                    {...register('voucher.message', {
+                      required: 'Message is required',
+                      maxLength: {
+                        value: 500,
+                        message: 'Message cannot be more than 500 characters'
+                      }
+                    })}
+                    rows={3}
+                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Enter a personal message for the recipient"
+                  />
+                  {errors.voucher?.message && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {typeof errors.voucher.message === 'string'
+                        ? errors.voucher.message
+                        : errors.voucher.message.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Template Selection */}
+              <div>
+                <label htmlFor="voucher.template" className="block text-sm font-medium text-gray-700">
+                  Voucher Template
+                </label>
+                <div className="mt-1">
+                  <select
+                    id="voucher.template"
+                    {...register('voucher.template', { required: 'Template is required' })}
+                    className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    onChange={handleTemplateChange}
                   >
-                    Copy
-                  </button>
+                    <option value="template1">Classic</option>
+                    <option value="template2">Modern</option>
+                    <option value="template3">Elegant</option>
+                    <option value="template4">Festive</option>
+                    <option value="template5">Minimalist</option>
+                  </select>
+                  {errors.voucher?.template && (
+                    <p className="mt-1 text-sm text-red-600">{errors.voucher.template.message}</p>
+                  )}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  The QR code contains this link. Share it or let customers scan the QR code to redeem the voucher.
-                </p>
               </div>
-              
-              {redemptionSuccess && (
-                <div className="mb-4 w-full bg-green-50 p-3 rounded-md">
-                  <p className="text-sm text-green-700">{redemptionSuccess}</p>
-                </div>
-              )}
-              
-              {redemptionError && (
-                <div className="mb-4 w-full bg-red-50 p-3 rounded-md">
-                  <p className="text-sm text-red-700">{redemptionError}</p>
-                </div>
-              )}
-              
-              <div className="w-full">
-                <button
-                  type="button"
-                  onClick={handleRedeemVoucher}
-                  disabled={isRedeeming || initialData.voucher.status !== 'active'}
-                  className={`w-full py-2 px-4 rounded-md text-white font-medium ${
-                    initialData.voucher.status === 'active' 
-                      ? 'bg-blue-600 hover:bg-blue-700' 
-                      : 'bg-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  {isRedeeming 
-                    ? 'Processing...' 
-                    : initialData.voucher.status === 'active' 
-                      ? 'Redeem Voucher' 
-                      : 'Voucher Already Redeemed'}
-                </button>
-              </div>
+            </section>
+
+            <div className="mt-4">
+              <VoucherPreview previewData={previewData} />
             </div>
+
           </div>
-        )}
+
+        </div>
+
+       
       </div>
-      
+
       {/* Submit Button */}
       <div className="pt-5">
         <div className="flex justify-end">
