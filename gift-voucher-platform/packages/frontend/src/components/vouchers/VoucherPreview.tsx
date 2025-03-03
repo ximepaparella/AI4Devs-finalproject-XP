@@ -43,7 +43,6 @@ const VoucherPreview: React.FC<VoucherPreviewProps> = ({ previewData }) => {
 
   return (
     <div className="voucher-preview-container">
-      <h3 className="text-lg font-semibold mb-4">Voucher Preview</h3>
       <div className="border rounded-md overflow-hidden">
         {renderTemplate()}
       </div>

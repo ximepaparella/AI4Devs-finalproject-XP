@@ -1,9 +1,9 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { Voucher } from '@/services/dashboard';
+import { Order } from '@/services/dashboard';
 
 interface VoucherTableProps {
-  vouchers: Voucher[];
+  vouchers: Order[];
   title?: string;
   loading?: boolean;
 }
@@ -11,8 +11,8 @@ interface VoucherTableProps {
 export default function VoucherTable({ vouchers, title = 'Vouchers', loading = false }: VoucherTableProps) {
   const router = useRouter();
 
-  const handleRowClick = (voucherId: string) => {
-    router.push(`/dashboard/vouchers/${voucherId}`);
+  const handleRowClick = (orderId: string) => {
+    router.push(`/orders/${orderId}/edit`);
   };
 
   const getStatusBadgeClass = (status: string) => {
@@ -60,7 +60,7 @@ export default function VoucherTable({ vouchers, title = 'Vouchers', loading = f
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Store
+                  Customer
                 </th>
                 <th
                   scope="col"
@@ -72,37 +72,33 @@ export default function VoucherTable({ vouchers, title = 'Vouchers', loading = f
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Expiration
+                  Date
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {vouchers.map((voucher) => (
-                <tr
-                  key={voucher.id}
-                  onClick={() => handleRowClick(voucher.id)}
+              {vouchers.map((order) => (
+                <tr 
+                  key={order._id} 
+                  onClick={() => handleRowClick(order._id)}
                   className="hover:bg-gray-50 cursor-pointer"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {voucher.code}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {voucher.productName || 'Unknown Product'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {voucher.storeName || 'Unknown Store'}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{order.voucher.code}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
-                        voucher.status
-                      )}`}
-                    >
-                      {voucher.status.charAt(0).toUpperCase() + voucher.status.slice(1)}
+                    <div className="text-sm text-gray-900">{order.productName || 'Unknown Product'}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{order.customerName || 'Unknown Customer'}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.voucher.status)}`}>
+                      {order.voucher.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(voucher.expirationDate).toLocaleDateString()}
+                    {new Date(order.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))}

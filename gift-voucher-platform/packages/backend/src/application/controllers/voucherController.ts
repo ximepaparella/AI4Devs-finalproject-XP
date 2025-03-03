@@ -6,6 +6,7 @@ import { User } from '../../domain/models/User';
 import mongoose from 'mongoose';
 import crypto from 'crypto';
 import QRCode from 'qrcode';
+import { Order } from '../../domain/models/Order';
 
 /**
  * Generate a unique voucher code
@@ -135,16 +136,20 @@ export const getVoucherById = async (req: Request, res: Response): Promise<void>
 
 /**
  * Get voucher by code
- * @route GET /api/vouchers/code/:code
- * @access Private
+ * @route GET /api/orders/voucher/:code
+ * @access Public
  */
 export const getVoucherByCode = async (req: Request, res: Response): Promise<void> => {
   try {
     const { code } = req.params;
 
-    const voucher = await Voucher.findOne({ code });
+    // Find the order that contains the voucher with the given code
+    const order = await Order.findOne({ 'voucher.code': code })
+      .populate('customerId', 'name email')
+      .populate('voucher.storeId', 'name')
+      .populate('voucher.productId', 'name price');
 
-    if (!voucher) {
+    if (!order) {
       res.status(404).json({
         success: false,
         error: 'Voucher not found'
@@ -152,9 +157,29 @@ export const getVoucherByCode = async (req: Request, res: Response): Promise<voi
       return;
     }
 
+    // Get related data
+    const customer = order.customerId as any;
+    const store = order.voucher.storeId as any;
+    const product = order.voucher.productId as any;
+
+    // Return the voucher data from the order
     res.status(200).json({
       success: true,
-      data: voucher
+      data: {
+        _id: order._id,
+        code: order.voucher.code,
+        status: order.voucher.status,
+        expirationDate: order.voucher.expirationDate,
+        qrCode: order.voucher.qrCode,
+        productName: product?.name || 'Unknown Product',
+        productId: order.voucher.productId,
+        customerName: customer?.name || 'Unknown Customer',
+        customerId: order.customerId,
+        storeName: store?.name || 'Unknown Store',
+        storeId: order.voucher.storeId,
+        amount: order.paymentDetails.amount,
+        createdAt: order.createdAt
+      }
     });
   } catch (error: any) {
     res.status(500).json({
@@ -549,17 +574,17 @@ export const deleteVoucher = async (req: Request, res: Response): Promise<void> 
 
 /**
  * Redeem voucher
- * @route PUT /api/vouchers/:code/redeem
- * @access Private
+ * @route PUT /api/orders/voucher/:code/redeem
+ * @access Public
  */
 export const redeemVoucher = async (req: Request, res: Response): Promise<void> => {
   try {
     const { code } = req.params;
 
-    // Find voucher by code
-    const voucher = await Voucher.findOne({ code });
+    // Find order with the voucher code
+    const order = await Order.findOne({ 'voucher.code': code });
     
-    if (!voucher) {
+    if (!order) {
       res.status(404).json({
         success: false,
         error: 'Voucher not found'
@@ -568,7 +593,7 @@ export const redeemVoucher = async (req: Request, res: Response): Promise<void> 
     }
 
     // Check if voucher is already redeemed
-    if (voucher.status === 'redeemed') {
+    if (order.voucher.status === 'redeemed') {
       res.status(400).json({
         success: false,
         error: 'Voucher has already been redeemed'
@@ -577,7 +602,12 @@ export const redeemVoucher = async (req: Request, res: Response): Promise<void> 
     }
 
     // Check if voucher is expired
-    if (voucher.status === 'expired' || new Date(voucher.expirationDate) < new Date()) {
+    const now = new Date();
+    if (new Date(order.voucher.expirationDate) < now) {
+      // Update voucher status to expired
+      order.voucher.status = 'expired';
+      await order.save();
+      
       res.status(400).json({
         success: false,
         error: 'Voucher has expired'
@@ -586,13 +616,37 @@ export const redeemVoucher = async (req: Request, res: Response): Promise<void> 
     }
 
     // Update voucher status to redeemed
-    voucher.status = 'redeemed';
-    await voucher.save();
+    order.voucher.status = 'redeemed';
+    await order.save();
+
+    // Populate related data for the response
+    await order.populate('customerId', 'name email');
+    await order.populate('voucher.storeId', 'name');
+    await order.populate('voucher.productId', 'name price');
+
+    // Get related data
+    const customer = order.customerId as any;
+    const store = order.voucher.storeId as any;
+    const product = order.voucher.productId as any;
 
     res.status(200).json({
       success: true,
-      data: voucher,
-      message: 'Voucher successfully redeemed'
+      message: 'Voucher successfully redeemed',
+      data: {
+        _id: order._id,
+        code: order.voucher.code,
+        status: order.voucher.status,
+        expirationDate: order.voucher.expirationDate,
+        qrCode: order.voucher.qrCode,
+        productName: product?.name || 'Unknown Product',
+        productId: order.voucher.productId,
+        customerName: customer?.name || 'Unknown Customer',
+        customerId: order.customerId,
+        storeName: store?.name || 'Unknown Store',
+        storeId: order.voucher.storeId,
+        amount: order.paymentDetails.amount,
+        createdAt: order.createdAt
+      }
     });
   } catch (error: any) {
     res.status(500).json({

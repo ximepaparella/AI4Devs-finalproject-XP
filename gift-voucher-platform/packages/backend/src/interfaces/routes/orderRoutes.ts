@@ -7,6 +7,7 @@ import {
   updateOrder,
   deleteOrder
 } from '../../application/controllers/orderController';
+import { getVoucherByCode, redeemVoucher } from '../../application/controllers/voucherController';
 
 const router = express.Router();
 
@@ -27,5 +28,11 @@ router.put('/:id', updateOrder);
 
 // DELETE order
 router.delete('/:id', deleteOrder);
+
+// GET voucher by code
+router.get('/voucher/:code', getVoucherByCode);
+
+// PUT redeem voucher by code
+router.put('/voucher/:code/redeem', redeemVoucher);
 
 export { router as orderRoutes }; 

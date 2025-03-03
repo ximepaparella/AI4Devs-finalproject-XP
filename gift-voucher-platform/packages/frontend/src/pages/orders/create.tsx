@@ -35,14 +35,14 @@ const CreateOrderPage: NextPage = () => {
   return (
     <DashboardLayout>
       <Head>
-        <title>Create Order | Gift Voucher Platform</title>
-        <meta name="description" content="Create a new order for a gift voucher" />
+        <title>Create Gift Voucher Order | Gift Voucher Platform</title>
+        <meta name="description" content="Create a new gift voucher order" />
       </Head>
 
       <div className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">Create New Order</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Create Gift Voucher Order</h1>
           </div>
 
           <div className="mt-4">
@@ -61,6 +61,9 @@ const CreateOrderPage: NextPage = () => {
 
             <div className="mt-4 bg-white shadow sm:rounded-lg">
               <div className="px-4 py-5 sm:p-6">
+                <p className="mb-4 text-sm text-gray-600">
+                  Create a new gift voucher order with payment details and voucher information in one step.
+                </p>
                 <OrderForm 
                   onSubmit={handleSubmit} 
                   isLoading={loading} 

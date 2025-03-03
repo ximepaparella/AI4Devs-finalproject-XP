@@ -3,7 +3,7 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
-import api from '@/services/api';
+import { useVouchers } from '@/hooks/useVouchers';
 
 interface VoucherData {
   _id: string;
@@ -16,38 +16,20 @@ interface VoucherData {
 const VoucherRedeemPage: NextPage = () => {
   const router = useRouter();
   const { code } = router.query;
-  const [voucher, setVoucher] = useState<VoucherData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { currentVoucher, loading, error, getVoucherByCode, redeemVoucher } = useVouchers();
   const [redeemStatus, setRedeemStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [redeemMessage, setRedeemMessage] = useState<string>('');
 
   useEffect(() => {
     const fetchVoucher = async () => {
       if (!code || typeof code !== 'string') return;
-
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await api.get(`/vouchers/code/${code}`);
-        
-        if (response.data.success) {
-          setVoucher(response.data.data);
-        } else {
-          setError(response.data.error || 'Failed to fetch voucher');
-        }
-      } catch (error: any) {
-        console.error('Error fetching voucher:', error);
-        setError(error.response?.data?.message || 'Failed to fetch voucher');
-      } finally {
-        setLoading(false);
-      }
+      await getVoucherByCode(code);
     };
 
     if (router.isReady) {
       fetchVoucher();
     }
-  }, [code, router.isReady]);
+  }, [code, router.isReady, getVoucherByCode]);
 
   const handleRedeemVoucher = async () => {
     if (!code || typeof code !== 'string') return;
@@ -56,21 +38,19 @@ const VoucherRedeemPage: NextPage = () => {
       setRedeemStatus('loading');
       setRedeemMessage('');
       
-      const response = await api.put(`/vouchers/code/${code}/redeem`);
+      const result = await redeemVoucher(code);
       
-      if (response.data.success) {
+      if (result) {
         setRedeemStatus('success');
-        setRedeemMessage(response.data.message || 'Voucher successfully redeemed!');
-        // Update the voucher data
-        setVoucher(response.data.data);
+        setRedeemMessage('Voucher has been successfully redeemed!');
       } else {
         setRedeemStatus('error');
-        setRedeemMessage(response.data.error || 'Failed to redeem voucher');
+        setRedeemMessage('Failed to redeem voucher. It may have already been redeemed or expired.');
       }
     } catch (error: any) {
       console.error('Error redeeming voucher:', error);
       setRedeemStatus('error');
-      setRedeemMessage(error.response?.data?.message || 'Failed to redeem voucher');
+      setRedeemMessage(error.response?.data?.message || 'An error occurred while redeeming the voucher');
     }
   };
 
@@ -79,7 +59,7 @@ const VoucherRedeemPage: NextPage = () => {
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -136,7 +116,7 @@ const VoucherRedeemPage: NextPage = () => {
     );
   }
 
-  if (!voucher) {
+  if (!currentVoucher) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
         <Head>
@@ -173,26 +153,26 @@ const VoucherRedeemPage: NextPage = () => {
       <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
         <div className="flex items-center justify-center mb-6">
           <img 
-            src={voucher.qrCode} 
-            alt={`QR Code for voucher ${voucher.code}`}
+            src={currentVoucher.qrCode} 
+            alt={`QR Code for voucher ${currentVoucher.code}`}
             className="w-32 h-32"
           />
         </div>
         
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">Voucher: {voucher.code}</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">Voucher: {currentVoucher.code}</h1>
         
         <div className="flex justify-center mb-6">
-          <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusBadgeClass(voucher.status)}`}>
-            {voucher.status}
+          <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusBadgeClass(currentVoucher.status)}`}>
+            {currentVoucher.status}
           </span>
         </div>
         
         <div className="mb-6">
           <p className="text-sm text-gray-500 mb-1">Expiration Date:</p>
-          <p className="text-base font-medium">{formatDate(voucher.expirationDate)}</p>
+          <p className="text-base font-medium">{formatDate(currentVoucher.expirationDate)}</p>
         </div>
         
-        {voucher.status === 'active' && (
+        {currentVoucher.status === 'active' && (
           <div className="mb-6">
             {redeemStatus === 'idle' && (
               <button
@@ -248,7 +228,7 @@ const VoucherRedeemPage: NextPage = () => {
           </div>
         )}
         
-        {voucher.status === 'redeemed' && (
+        {currentVoucher.status === 'redeemed' && (
           <div className="mb-6 p-4 bg-blue-50 rounded-md">
             <div className="flex">
               <div className="flex-shrink-0">
@@ -263,7 +243,7 @@ const VoucherRedeemPage: NextPage = () => {
           </div>
         )}
         
-        {voucher.status === 'expired' && (
+        {currentVoucher.status === 'expired' && (
           <div className="mb-6 p-4 bg-red-50 rounded-md">
             <div className="flex">
               <div className="flex-shrink-0">

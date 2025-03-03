@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Order } from '@/hooks/useOrders';
+import VoucherPreviewModal from '../ui/VoucherPreviewModal';
 
 interface OrdersTableProps {
   orders: Order[];
@@ -13,10 +14,23 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
   onDelete,
   isLoading
 }) => {
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this order?')) {
       await onDelete(id);
     }
+  };
+
+  const handlePreviewClick = (order: Order) => {
+    setSelectedOrder(order);
+    setIsPreviewModalOpen(true);
+  };
+
+  const closePreviewModal = () => {
+    setIsPreviewModalOpen(false);
+    setSelectedOrder(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -65,69 +79,85 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Order ID
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Payment Details
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Created At
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {orders.map((order) => (
-            <tr key={order._id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{order._id.substring(0, 8)}...</div>
-                <div className="text-xs text-gray-500">Voucher: {order.voucherId.substring(0, 8)}...</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{formatCurrency(order.paymentDetails.amount)}</div>
-                <div className="text-sm text-gray-500">{order.paymentDetails.paymentEmail}</div>
-                <div className="text-xs text-gray-500">Provider: {order.paymentDetails.provider}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  getStatusBadgeClass(order.paymentDetails.paymentStatus)
-                }`}>
-                  {order.paymentDetails.paymentStatus}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-500">
-                  {formatDate(order.createdAt)}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                <Link
-                  href={`/orders/${order._id}/edit`}
-                  className="text-indigo-600 hover:text-indigo-900"
-                >
-                  Edit
-                </Link>
-                <button
-                  onClick={() => handleDelete(order._id)}
-                  className="text-red-600 hover:text-red-900"
-                >
-                  Delete
-                </button>
-              </td>
+    <>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Order ID
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Payment Details
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Created At
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {orders.map((order) => (
+              <tr key={order._id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">{order._id.substring(0, 8)}...</div>
+                  <div className="text-xs text-gray-500">Voucher: {order.voucher.code}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{formatCurrency(order.paymentDetails.amount)}</div>
+                  <div className="text-sm text-gray-500">{order.paymentDetails.paymentEmail}</div>
+                  <div className="text-xs text-gray-500">Provider: {order.paymentDetails.provider}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    getStatusBadgeClass(order.paymentDetails.paymentStatus)
+                  }`}>
+                    {order.paymentDetails.paymentStatus}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-500">
+                    {formatDate(order.createdAt)}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  <Link
+                    href={`/orders/${order._id}/edit`}
+                    className="text-indigo-600 hover:text-indigo-900"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handlePreviewClick(order)}
+                    className="text-green-600 hover:text-green-900"
+                  >
+                    Preview
+                  </button>
+                  <button
+                    onClick={() => handleDelete(order._id)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {selectedOrder && (
+        <VoucherPreviewModal
+          isOpen={isPreviewModalOpen}
+          onClose={closePreviewModal}
+          order={selectedOrder}
+        />
+      )}
+    </>
   );
 }; 

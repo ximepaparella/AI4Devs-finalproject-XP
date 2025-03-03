@@ -4,13 +4,26 @@ import api from '../services/api';
 export interface Order {
   _id: string;
   customerId: string;
-  voucherId: string;
   paymentDetails: {
     paymentId: string;
     paymentStatus: 'pending' | 'completed' | 'failed';
     paymentEmail: string;
     amount: number;
     provider: 'mercadopago' | 'paypal' | 'stripe';
+  };
+  voucher: {
+    storeId: string;
+    productId: string;
+    code: string;
+    status: 'active' | 'redeemed' | 'expired';
+    expirationDate: string;
+    qrCode: string;
+    sender_name: string;
+    sender_email: string;
+    receiver_name: string;
+    receiver_email: string;
+    message: string;
+    template: string;
   };
   createdAt: string;
   updatedAt: string;
@@ -18,7 +31,6 @@ export interface Order {
 
 export interface CreateOrderData {
   customerId: string;
-  voucherId: string;
   paymentDetails: {
     paymentId: string;
     paymentStatus: 'pending' | 'completed' | 'failed';
@@ -26,15 +38,36 @@ export interface CreateOrderData {
     amount: number;
     provider: 'mercadopago' | 'paypal' | 'stripe';
   };
+  voucher: {
+    storeId: string;
+    productId: string;
+    expirationDate: string;
+    sender_name: string;
+    sender_email: string;
+    receiver_name: string;
+    receiver_email: string;
+    message: string;
+    template: string;
+  };
 }
 
 export interface UpdateOrderData {
-  paymentDetails: {
+  paymentDetails?: {
     paymentId?: string;
     paymentStatus?: 'pending' | 'completed' | 'failed';
     paymentEmail?: string;
     amount?: number;
     provider?: 'mercadopago' | 'paypal' | 'stripe';
+  };
+  voucher?: {
+    status?: 'active' | 'redeemed' | 'expired';
+    expirationDate?: string;
+    sender_name?: string;
+    sender_email?: string;
+    receiver_name?: string;
+    receiver_email?: string;
+    message?: string;
+    template?: string;
   };
 }
 

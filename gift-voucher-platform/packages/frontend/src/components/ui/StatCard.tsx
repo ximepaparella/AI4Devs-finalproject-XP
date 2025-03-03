@@ -1,13 +1,14 @@
 import React, { ReactNode } from 'react';
 
-interface StatCardProps {
+export interface StatCardProps {
   title: string;
   value: number;
   icon?: ReactNode;
   onClick?: () => void;
+  description?: string;
 }
 
-export default function StatCard({ title, value, icon, onClick }: StatCardProps) {
+export default function StatCard({ title, value, icon, onClick, description }: StatCardProps) {
   return (
     <div
       className={`bg-white overflow-hidden shadow rounded-lg ${
@@ -21,6 +22,9 @@ export default function StatCard({ title, value, icon, onClick }: StatCardProps)
           <div>
             <p className="text-sm font-medium text-gray-500 truncate">{title}</p>
             <p className="mt-1 text-3xl font-semibold text-gray-900">{value}</p>
+            {description && (
+              <p className="mt-1 text-sm text-gray-500">{description}</p>
+            )}
           </div>
         </div>
       </div>
