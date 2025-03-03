@@ -23,6 +23,7 @@ export default function DashboardLayout({ children, title = 'Dashboard' }: Dashb
     { name: 'Products', href: '/dashboard/products', current: router.pathname.startsWith('/dashboard/products') },
     { name: 'Orders', href: '/dashboard/orders', current: router.pathname.startsWith('/dashboard/orders') },
     { name: 'Vouchers', href: '/dashboard/vouchers', current: router.pathname.startsWith('/dashboard/vouchers') },
+    { name: 'Stores', href: '/stores', current: router.pathname.startsWith('/stores') },
   ];
 
   return (
