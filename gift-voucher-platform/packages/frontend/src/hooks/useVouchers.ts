@@ -10,8 +10,15 @@ export interface Voucher {
   status: 'active' | 'redeemed' | 'expired';
   expirationDate: string;
   qrCode: string;
+  sender_name: string;
+  sender_email: string;
+  receiver_name: string;
+  receiver_email: string;
+  message: string;
+  template: string;
   createdAt: string;
   updatedAt: string;
+  productName?: string;
 }
 
 export interface CreateVoucherData {
@@ -20,12 +27,24 @@ export interface CreateVoucherData {
   customerId?: string;
   expirationDate: string;
   status?: 'active' | 'redeemed' | 'expired';
+  sender_name: string;
+  sender_email: string;
+  receiver_name: string;
+  receiver_email: string;
+  message: string;
+  template: string;
 }
 
 export interface UpdateVoucherData {
   customerId?: string;
   status?: 'active' | 'redeemed' | 'expired';
   expirationDate?: string;
+  sender_name?: string;
+  sender_email?: string;
+  receiver_name?: string;
+  receiver_email?: string;
+  message?: string;
+  template?: string;
 }
 
 export function useVouchers() {
@@ -80,7 +99,20 @@ export function useVouchers() {
       const response = await api.get(`/vouchers/${id}`);
       
       if (response.data.success) {
-        setCurrentVoucher(response.data.data);
+        const voucher = response.data.data;
+        
+        // Fetch product details to get the product name
+        try {
+          const productResponse = await api.get(`/products/${voucher.productId}`);
+          if (productResponse.data.success) {
+            voucher.productName = productResponse.data.data.name;
+          }
+        } catch (productError) {
+          console.error('Error fetching product details:', productError);
+          // Continue even if product fetch fails
+        }
+        
+        setCurrentVoucher(voucher);
       } else {
         setError(response.data.error || 'Failed to fetch voucher');
       }

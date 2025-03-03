@@ -304,31 +304,44 @@ export const getVouchersByCustomerId = async (req: Request, res: Response): Prom
  */
 export const createVoucher = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { storeId, productId, customerId, expirationDate, status } = req.body;
+    const { 
+      storeId, 
+      productId, 
+      customerId, 
+      expirationDate, 
+      status,
+      sender_name,
+      sender_email,
+      receiver_name,
+      receiver_email,
+      message,
+      template
+    } = req.body;
 
-    // Validate if the storeId is a valid MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(storeId)) {
+    // Validate required fields
+    if (!storeId || !productId || !expirationDate) {
       res.status(400).json({
         success: false,
-        error: 'Invalid store ID format'
+        error: 'Please provide storeId, productId, and expirationDate'
       });
       return;
     }
 
-    // Validate if the productId is a valid MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
+    // Validate gift voucher fields
+    if (!sender_name || !sender_email || !receiver_name || !receiver_email || !message) {
       res.status(400).json({
         success: false,
-        error: 'Invalid product ID format'
+        error: 'Please provide sender_name, sender_email, receiver_name, receiver_email, and message'
       });
       return;
     }
 
-    // Validate customerId if provided
-    if (customerId && !mongoose.Types.ObjectId.isValid(customerId)) {
+    // Validate email formats
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(sender_email) || !emailRegex.test(receiver_email)) {
       res.status(400).json({
         success: false,
-        error: 'Invalid customer ID format'
+        error: 'Please provide valid email addresses'
       });
       return;
     }
@@ -355,7 +368,7 @@ export const createVoucher = async (req: Request, res: Response): Promise<void> 
 
     // Check if customer exists if customerId is provided
     if (customerId) {
-      const customer = await User.findById(customerId);
+      const customer = await User.findOne({ _id: customerId, role: 'customer' });
       if (!customer) {
         res.status(404).json({
           success: false,
@@ -365,48 +378,38 @@ export const createVoucher = async (req: Request, res: Response): Promise<void> 
       }
     }
 
-    // Generate voucher code
+    // Generate unique voucher code
     const code = generateVoucherCode();
-    
+
     // Generate QR code
     const qrCode = await generateQRCode(code);
 
     // Create new voucher
-    const voucher = await Voucher.create({
+    const voucher = new Voucher({
       storeId,
       productId,
       customerId: customerId || null,
       code,
       status: status || 'active',
       expirationDate,
-      qrCode
+      qrCode,
+      sender_name,
+      sender_email,
+      receiver_name,
+      receiver_email,
+      message,
+      template: template || 'template1'
     });
+
+    await voucher.save();
+
+    // TODO: Send email with voucher details to sender, receiver, and store manager
 
     res.status(201).json({
       success: true,
       data: voucher
     });
   } catch (error: any) {
-    // Handle validation errors
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err: any) => err.message);
-      
-      res.status(400).json({
-        success: false,
-        error: messages
-      });
-      return;
-    }
-
-    // Handle duplicate key error (e.g., duplicate voucher code)
-    if (error.code === 11000) {
-      res.status(400).json({
-        success: false,
-        error: 'Duplicate voucher code. Please try again.'
-      });
-      return;
-    }
-
     res.status(500).json({
       success: false,
       error: 'Server Error',
@@ -423,18 +426,19 @@ export const createVoucher = async (req: Request, res: Response): Promise<void> 
 export const updateVoucher = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { customerId, status, expirationDate } = req.body;
+    const { 
+      customerId, 
+      status, 
+      expirationDate,
+      sender_name,
+      sender_email,
+      receiver_name,
+      receiver_email,
+      message,
+      template
+    } = req.body;
 
-    // Validate if the ID is a valid MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({
-        success: false,
-        error: 'Invalid voucher ID format'
-      });
-      return;
-    }
-
-    // Check if voucher exists
+    // Find voucher by ID
     const voucher = await Voucher.findById(id);
     if (!voucher) {
       res.status(404).json({
@@ -444,18 +448,26 @@ export const updateVoucher = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Validate customerId if provided
-    if (customerId && !mongoose.Types.ObjectId.isValid(customerId)) {
+    // Validate email formats if provided
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (sender_email && !emailRegex.test(sender_email)) {
       res.status(400).json({
         success: false,
-        error: 'Invalid customer ID format'
+        error: 'Please provide a valid sender email address'
+      });
+      return;
+    }
+    if (receiver_email && !emailRegex.test(receiver_email)) {
+      res.status(400).json({
+        success: false,
+        error: 'Please provide a valid receiver email address'
       });
       return;
     }
 
     // Check if customer exists if customerId is provided
     if (customerId) {
-      const customer = await User.findById(customerId);
+      const customer = await User.findOne({ _id: customerId, role: 'customer' });
       if (!customer) {
         res.status(404).json({
           success: false,
@@ -465,29 +477,24 @@ export const updateVoucher = async (req: Request, res: Response): Promise<void> 
       }
     }
 
-    // Update voucher
-    const updatedVoucher = await Voucher.findByIdAndUpdate(
-      id,
-      { customerId, status, expirationDate },
-      { new: true, runValidators: true }
-    );
+    // Update voucher fields
+    if (customerId !== undefined) voucher.customerId = customerId;
+    if (status) voucher.status = status;
+    if (expirationDate) voucher.expirationDate = new Date(expirationDate);
+    if (sender_name) voucher.sender_name = sender_name;
+    if (sender_email) voucher.sender_email = sender_email;
+    if (receiver_name) voucher.receiver_name = receiver_name;
+    if (receiver_email) voucher.receiver_email = receiver_email;
+    if (message) voucher.message = message;
+    if (template) voucher.template = template;
+
+    await voucher.save();
 
     res.status(200).json({
       success: true,
-      data: updatedVoucher
+      data: voucher
     });
   } catch (error: any) {
-    // Handle validation errors
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err: any) => err.message);
-      
-      res.status(400).json({
-        success: false,
-        error: messages
-      });
-      return;
-    }
-
     res.status(500).json({
       success: false,
       error: 'Server Error',

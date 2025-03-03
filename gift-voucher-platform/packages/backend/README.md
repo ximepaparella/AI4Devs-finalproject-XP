@@ -624,19 +624,11 @@ Deletes a product.
 
 #### Get All Vouchers
 
-Retrieves a list of all vouchers with optional filtering, sorting, and pagination.
+Retrieves a list of all vouchers.
 
 - **URL**: `/vouchers`
 - **Method**: `GET`
-- **Query Parameters**:
-  - `storeId`: Filter vouchers by store ID
-  - `productId`: Filter vouchers by product ID
-  - `customerId`: Filter vouchers by customer ID
-  - `status`: Filter by status (active, redeemed, expired)
-  - `sort`: Sort by field (prefix with - for descending order, e.g., -createdAt)
-  - `limit`: Number of results per page (default: 10)
-  - `page`: Page number (default: 1)
-- **Access**: Private/Admin
+- **Access**: Admin
 - **Response**:
   - **Code**: 200 OK
   - **Content**:
@@ -646,26 +638,38 @@ Retrieves a list of all vouchers with optional filtering, sorting, and paginatio
       "count": 2,
       "data": [
         {
-          "_id": "60d21b4667d0d8992e610c91",
+          "_id": "60d21b4667d0d8992e610c89",
           "storeId": "60d21b4667d0d8992e610c87",
-          "productId": "60d21b4667d0d8992e610c89",
+          "productId": "60d21b4667d0d8992e610c88",
           "customerId": "60d21b4667d0d8992e610c85",
-          "code": "ABCD-1234-XYZ9",
+          "code": "ABC123XYZ",
           "status": "active",
-          "expirationDate": "2024-12-31T23:59:59.999Z",
+          "expirationDate": "2023-12-31T00:00:00.000Z",
           "qrCode": "data:image/png;base64,...",
+          "sender_name": "John Doe",
+          "sender_email": "john@example.com",
+          "receiver_name": "Jane Smith",
+          "receiver_email": "jane@example.com",
+          "message": "Happy birthday! Enjoy your gift!",
+          "template": "template1",
           "createdAt": "2023-06-22T19:12:38.657Z",
           "updatedAt": "2023-06-22T19:12:38.657Z"
         },
         {
-          "_id": "60d21b4667d0d8992e610c92",
+          "_id": "60d21b4667d0d8992e610c90",
           "storeId": "60d21b4667d0d8992e610c87",
-          "productId": "60d21b4667d0d8992e610c90",
-          "customerId": "60d21b4667d0d8992e610c86",
-          "code": "EFGH-5678-ABC1",
+          "productId": "60d21b4667d0d8992e610c88",
+          "customerId": null,
+          "code": "DEF456UVW",
           "status": "redeemed",
-          "expirationDate": "2024-12-31T23:59:59.999Z",
+          "expirationDate": "2023-12-31T00:00:00.000Z",
           "qrCode": "data:image/png;base64,...",
+          "sender_name": "Alice Johnson",
+          "sender_email": "alice@example.com",
+          "receiver_name": "Bob Brown",
+          "receiver_email": "bob@example.com",
+          "message": "Thank you for your help!",
+          "template": "template2",
           "createdAt": "2023-06-22T19:12:38.657Z",
           "updatedAt": "2023-06-22T19:12:38.657Z"
         }
@@ -681,7 +685,7 @@ Retrieves a specific voucher by ID.
 - **Method**: `GET`
 - **URL Parameters**: 
   - `id`: MongoDB ObjectId of the voucher
-- **Access**: Private
+- **Access**: Admin, Store Manager, or Customer (if assigned to them)
 - **Response**:
   - **Code**: 200 OK
   - **Content**:
@@ -689,14 +693,20 @@ Retrieves a specific voucher by ID.
     {
       "success": true,
       "data": {
-        "_id": "60d21b4667d0d8992e610c91",
+        "_id": "60d21b4667d0d8992e610c89",
         "storeId": "60d21b4667d0d8992e610c87",
-        "productId": "60d21b4667d0d8992e610c89",
+        "productId": "60d21b4667d0d8992e610c88",
         "customerId": "60d21b4667d0d8992e610c85",
-        "code": "ABCD-1234-XYZ9",
+        "code": "ABC123XYZ",
         "status": "active",
-        "expirationDate": "2024-12-31T23:59:59.999Z",
+        "expirationDate": "2023-12-31T00:00:00.000Z",
         "qrCode": "data:image/png;base64,...",
+        "sender_name": "John Doe",
+        "sender_email": "john@example.com",
+        "receiver_name": "Jane Smith",
+        "receiver_email": "jane@example.com",
+        "message": "Happy birthday! Enjoy your gift!",
+        "template": "template1",
         "createdAt": "2023-06-22T19:12:38.657Z",
         "updatedAt": "2023-06-22T19:12:38.657Z"
       }
@@ -714,7 +724,7 @@ Retrieves a specific voucher by its code.
 - **Method**: `GET`
 - **URL Parameters**: 
   - `code`: Unique voucher code
-- **Access**: Private
+- **Access**: Public
 - **Response**:
   - **Code**: 200 OK
   - **Content**:
@@ -722,14 +732,20 @@ Retrieves a specific voucher by its code.
     {
       "success": true,
       "data": {
-        "_id": "60d21b4667d0d8992e610c91",
+        "_id": "60d21b4667d0d8992e610c89",
         "storeId": "60d21b4667d0d8992e610c87",
-        "productId": "60d21b4667d0d8992e610c89",
+        "productId": "60d21b4667d0d8992e610c88",
         "customerId": "60d21b4667d0d8992e610c85",
-        "code": "ABCD-1234-XYZ9",
+        "code": "ABC123XYZ",
         "status": "active",
-        "expirationDate": "2024-12-31T23:59:59.999Z",
+        "expirationDate": "2023-12-31T00:00:00.000Z",
         "qrCode": "data:image/png;base64,...",
+        "sender_name": "John Doe",
+        "sender_email": "john@example.com",
+        "receiver_name": "Jane Smith",
+        "receiver_email": "jane@example.com",
+        "message": "Happy birthday! Enjoy your gift!",
+        "template": "template1",
         "createdAt": "2023-06-22T19:12:38.657Z",
         "updatedAt": "2023-06-22T19:12:38.657Z"
       }
@@ -738,115 +754,26 @@ Retrieves a specific voucher by its code.
   - **Error Codes**:
     - 404 Not Found - Voucher not found
 
-#### Get Vouchers by Store ID
-
-Retrieves all vouchers for a specific store with optional filtering, sorting, and pagination.
-
-- **URL**: `/vouchers/store/:storeId`
-- **Method**: `GET`
-- **URL Parameters**: 
-  - `storeId`: MongoDB ObjectId of the store
-- **Query Parameters**:
-  - `status`: Filter by status (active, redeemed, expired)
-  - `sort`: Sort by field (prefix with - for descending order, e.g., -createdAt)
-  - `limit`: Number of results per page (default: 10)
-  - `page`: Page number (default: 1)
-- **Access**: Private/StoreManager
-- **Response**:
-  - **Code**: 200 OK
-  - **Content**:
-    ```json
-    {
-      "success": true,
-      "count": 2,
-      "data": [
-        {
-          "_id": "60d21b4667d0d8992e610c91",
-          "storeId": "60d21b4667d0d8992e610c87",
-          "productId": "60d21b4667d0d8992e610c89",
-          "customerId": "60d21b4667d0d8992e610c85",
-          "code": "ABCD-1234-XYZ9",
-          "status": "active",
-          "expirationDate": "2024-12-31T23:59:59.999Z",
-          "qrCode": "data:image/png;base64,...",
-          "createdAt": "2023-06-22T19:12:38.657Z",
-          "updatedAt": "2023-06-22T19:12:38.657Z"
-        },
-        {
-          "_id": "60d21b4667d0d8992e610c92",
-          "storeId": "60d21b4667d0d8992e610c87",
-          "productId": "60d21b4667d0d8992e610c90",
-          "customerId": "60d21b4667d0d8992e610c86",
-          "code": "EFGH-5678-ABC1",
-          "status": "redeemed",
-          "expirationDate": "2024-12-31T23:59:59.999Z",
-          "qrCode": "data:image/png;base64,...",
-          "createdAt": "2023-06-22T19:12:38.657Z",
-          "updatedAt": "2023-06-22T19:12:38.657Z"
-        }
-      ]
-    }
-    ```
-  - **Error Codes**:
-    - 400 Bad Request - Invalid store ID format
-    - 404 Not Found - Store not found
-
-#### Get Vouchers by Customer ID
-
-Retrieves all vouchers for a specific customer with optional filtering, sorting, and pagination.
-
-- **URL**: `/vouchers/customer/:customerId`
-- **Method**: `GET`
-- **URL Parameters**: 
-  - `customerId`: MongoDB ObjectId of the customer
-- **Query Parameters**:
-  - `status`: Filter by status (active, redeemed, expired)
-  - `sort`: Sort by field (prefix with - for descending order, e.g., -createdAt)
-  - `limit`: Number of results per page (default: 10)
-  - `page`: Page number (default: 1)
-- **Access**: Private
-- **Response**:
-  - **Code**: 200 OK
-  - **Content**:
-    ```json
-    {
-      "success": true,
-      "count": 1,
-      "data": [
-        {
-          "_id": "60d21b4667d0d8992e610c91",
-          "storeId": "60d21b4667d0d8992e610c87",
-          "productId": "60d21b4667d0d8992e610c89",
-          "customerId": "60d21b4667d0d8992e610c85",
-          "code": "ABCD-1234-XYZ9",
-          "status": "active",
-          "expirationDate": "2024-12-31T23:59:59.999Z",
-          "qrCode": "data:image/png;base64,...",
-          "createdAt": "2023-06-22T19:12:38.657Z",
-          "updatedAt": "2023-06-22T19:12:38.657Z"
-        }
-      ]
-    }
-    ```
-  - **Error Codes**:
-    - 400 Bad Request - Invalid customer ID format
-    - 404 Not Found - Customer not found
-
 #### Create Voucher
 
 Creates a new voucher.
 
 - **URL**: `/vouchers`
 - **Method**: `POST`
-- **Access**: Private/StoreManager
+- **Access**: Admin or Store Manager
 - **Request Body**:
   ```json
   {
     "storeId": "60d21b4667d0d8992e610c87",
-    "productId": "60d21b4667d0d8992e610c89",
-    "customerId": "60d21b4667d0d8992e610c85",
-    "expirationDate": "2024-12-31T23:59:59.999Z",
-    "status": "active"
+    "productId": "60d21b4667d0d8992e610c88",
+    "customerId": "60d21b4667d0d8992e610c85", // Optional
+    "expirationDate": "2023-12-31T00:00:00.000Z",
+    "sender_name": "John Doe",
+    "sender_email": "john@example.com",
+    "receiver_name": "Jane Smith",
+    "receiver_email": "jane@example.com",
+    "message": "Happy birthday! Enjoy your gift!",
+    "template": "template1" // Optional, defaults to "template1"
   }
   ```
 - **Response**:
@@ -856,21 +783,27 @@ Creates a new voucher.
     {
       "success": true,
       "data": {
-        "_id": "60d21b4667d0d8992e610c91",
+        "_id": "60d21b4667d0d8992e610c89",
         "storeId": "60d21b4667d0d8992e610c87",
-        "productId": "60d21b4667d0d8992e610c89",
+        "productId": "60d21b4667d0d8992e610c88",
         "customerId": "60d21b4667d0d8992e610c85",
-        "code": "ABCD-1234-XYZ9",
+        "code": "ABC123XYZ", // Automatically generated
         "status": "active",
-        "expirationDate": "2024-12-31T23:59:59.999Z",
-        "qrCode": "data:image/png;base64,...",
+        "expirationDate": "2023-12-31T00:00:00.000Z",
+        "qrCode": "data:image/png;base64,...", // Automatically generated
+        "sender_name": "John Doe",
+        "sender_email": "john@example.com",
+        "receiver_name": "Jane Smith",
+        "receiver_email": "jane@example.com",
+        "message": "Happy birthday! Enjoy your gift!",
+        "template": "template1",
         "createdAt": "2023-06-22T19:12:38.657Z",
         "updatedAt": "2023-06-22T19:12:38.657Z"
       }
     }
     ```
   - **Error Codes**:
-    - 400 Bad Request - Validation error, invalid ID format, or duplicate voucher code
+    - 400 Bad Request - Validation error
     - 404 Not Found - Store, product, or customer not found
 
 #### Update Voucher
@@ -881,13 +814,19 @@ Updates an existing voucher.
 - **Method**: `PUT`
 - **URL Parameters**: 
   - `id`: MongoDB ObjectId of the voucher
-- **Access**: Private/StoreManager
+- **Access**: Admin or Store Manager
 - **Request Body**:
   ```json
   {
-    "customerId": "60d21b4667d0d8992e610c86",
-    "status": "active",
-    "expirationDate": "2025-12-31T23:59:59.999Z"
+    "customerId": "60d21b4667d0d8992e610c85",
+    "status": "redeemed",
+    "expirationDate": "2024-01-31T00:00:00.000Z",
+    "sender_name": "John Updated",
+    "sender_email": "john.updated@example.com",
+    "receiver_name": "Jane Updated",
+    "receiver_email": "jane.updated@example.com",
+    "message": "Updated message!",
+    "template": "template2"
   }
   ```
 - **Response**:
@@ -897,14 +836,20 @@ Updates an existing voucher.
     {
       "success": true,
       "data": {
-        "_id": "60d21b4667d0d8992e610c91",
+        "_id": "60d21b4667d0d8992e610c89",
         "storeId": "60d21b4667d0d8992e610c87",
-        "productId": "60d21b4667d0d8992e610c89",
-        "customerId": "60d21b4667d0d8992e610c86",
-        "code": "ABCD-1234-XYZ9",
-        "status": "active",
-        "expirationDate": "2025-12-31T23:59:59.999Z",
+        "productId": "60d21b4667d0d8992e610c88",
+        "customerId": "60d21b4667d0d8992e610c85",
+        "code": "ABC123XYZ",
+        "status": "redeemed",
+        "expirationDate": "2024-01-31T00:00:00.000Z",
         "qrCode": "data:image/png;base64,...",
+        "sender_name": "John Updated",
+        "sender_email": "john.updated@example.com",
+        "receiver_name": "Jane Updated",
+        "receiver_email": "jane.updated@example.com",
+        "message": "Updated message!",
+        "template": "template2",
         "createdAt": "2023-06-22T19:12:38.657Z",
         "updatedAt": "2023-06-22T19:15:38.657Z"
       }
@@ -912,7 +857,7 @@ Updates an existing voucher.
     ```
   - **Error Codes**:
     - 400 Bad Request - Invalid ID format or validation error
-    - 404 Not Found - Voucher or customer not found
+    - 404 Not Found - Voucher not found
 
 #### Delete Voucher
 
@@ -922,7 +867,7 @@ Deletes a voucher.
 - **Method**: `DELETE`
 - **URL Parameters**: 
   - `id`: MongoDB ObjectId of the voucher
-- **Access**: Private/StoreManager
+- **Access**: Admin or Store Manager
 - **Response**:
   - **Code**: 200 OK
   - **Content**:
@@ -944,7 +889,7 @@ Redeems a voucher by its code.
 - **Method**: `PUT`
 - **URL Parameters**: 
   - `code`: Unique voucher code
-- **Access**: Private
+- **Access**: Public
 - **Response**:
   - **Code**: 200 OK
   - **Content**:
@@ -952,14 +897,20 @@ Redeems a voucher by its code.
     {
       "success": true,
       "data": {
-        "_id": "60d21b4667d0d8992e610c91",
+        "_id": "60d21b4667d0d8992e610c89",
         "storeId": "60d21b4667d0d8992e610c87",
-        "productId": "60d21b4667d0d8992e610c89",
+        "productId": "60d21b4667d0d8992e610c88",
         "customerId": "60d21b4667d0d8992e610c85",
-        "code": "ABCD-1234-XYZ9",
+        "code": "ABC123XYZ",
         "status": "redeemed",
-        "expirationDate": "2024-12-31T23:59:59.999Z",
+        "expirationDate": "2023-12-31T00:00:00.000Z",
         "qrCode": "data:image/png;base64,...",
+        "sender_name": "John Doe",
+        "sender_email": "john@example.com",
+        "receiver_name": "Jane Smith",
+        "receiver_email": "jane@example.com",
+        "message": "Happy birthday! Enjoy your gift!",
+        "template": "template1",
         "createdAt": "2023-06-22T19:12:38.657Z",
         "updatedAt": "2023-06-22T19:15:38.657Z"
       },
@@ -967,334 +918,27 @@ Redeems a voucher by its code.
     }
     ```
   - **Error Codes**:
-    - 400 Bad Request - Voucher already redeemed or expired
     - 404 Not Found - Voucher not found
+    - 400 Bad Request - Voucher already redeemed or expired
 
-### Order Endpoints
+### Voucher Templates
 
-#### Get All Orders
+The system supports 5 different voucher templates that can be selected when creating a voucher:
 
-Retrieves a list of all orders with optional filtering, sorting, and pagination.
+1. **template1**: Classic design with a two-column layout
+2. **template2**: Modern design with a header and content sections
+3. **template3**: Gradient design with a colorful background
+4. **template4**: Elegant design with decorative corners
+5. **template5**: Minimalist design with a clean layout
 
-- **URL**: `/orders`
-- **Method**: `GET`
-- **Query Parameters**:
-  - `customerId`: Filter orders by customer ID
-  - `voucherId`: Filter orders by voucher ID
-  - `paymentStatus`: Filter by payment status (pending, completed, failed)
-  - `sort`: Sort by field (prefix with - for descending order, e.g., -createdAt)
-  - `limit`: Number of results per page (default: 10)
-  - `page`: Page number (default: 1)
-- **Access**: Private/Admin
-- **Response**:
-  - **Code**: 200 OK
-  - **Content**:
-    ```json
-    {
-      "success": true,
-      "count": 2,
-      "data": [
-        {
-          "_id": "60d21b4667d0d8992e610c93",
-          "customerId": "60d21b4667d0d8992e610c85",
-          "voucherId": "60d21b4667d0d8992e610c91",
-          "paymentDetails": {
-            "paymentId": "PAY-123456789",
-            "paymentStatus": "completed",
-            "paymentEmail": "customer@example.com",
-            "amount": 99.99,
-            "provider": "paypal"
-          },
-          "createdAt": "2023-06-22T19:12:38.657Z",
-          "updatedAt": "2023-06-22T19:12:38.657Z"
-        },
-        {
-          "_id": "60d21b4667d0d8992e610c94",
-          "customerId": "60d21b4667d0d8992e610c86",
-          "voucherId": "60d21b4667d0d8992e610c92",
-          "paymentDetails": {
-            "paymentId": "PAY-987654321",
-            "paymentStatus": "pending",
-            "paymentEmail": "another.customer@example.com",
-            "amount": 149.99,
-            "provider": "stripe"
-          },
-          "createdAt": "2023-06-22T19:12:38.657Z",
-          "updatedAt": "2023-06-22T19:12:38.657Z"
-        }
-      ]
-    }
-    ```
-
-#### Get Order by ID
-
-Retrieves a specific order by ID.
-
-- **URL**: `/orders/:id`
-- **Method**: `GET`
-- **URL Parameters**: 
-  - `id`: MongoDB ObjectId of the order
-- **Access**: Private
-- **Response**:
-  - **Code**: 200 OK
-  - **Content**:
-    ```json
-    {
-      "success": true,
-      "data": {
-        "_id": "60d21b4667d0d8992e610c93",
-        "customerId": "60d21b4667d0d8992e610c85",
-        "voucherId": "60d21b4667d0d8992e610c91",
-        "paymentDetails": {
-          "paymentId": "PAY-123456789",
-          "paymentStatus": "completed",
-          "paymentEmail": "customer@example.com",
-          "amount": 99.99,
-          "provider": "paypal"
-        },
-        "createdAt": "2023-06-22T19:12:38.657Z",
-        "updatedAt": "2023-06-22T19:12:38.657Z"
-      }
-    }
-    ```
-  - **Error Codes**:
-    - 400 Bad Request - Invalid ID format
-    - 404 Not Found - Order not found
-
-#### Get Orders by Customer ID
-
-Retrieves all orders for a specific customer with optional sorting and pagination.
-
-- **URL**: `/orders/customer/:customerId`
-- **Method**: `GET`
-- **URL Parameters**: 
-  - `customerId`: MongoDB ObjectId of the customer
-- **Query Parameters**:
-  - `sort`: Sort by field (prefix with - for descending order, e.g., -createdAt)
-  - `limit`: Number of results per page (default: 10)
-  - `page`: Page number (default: 1)
-- **Access**: Private
-- **Response**:
-  - **Code**: 200 OK
-  - **Content**:
-    ```json
-    {
-      "success": true,
-      "count": 1,
-      "data": [
-        {
-          "_id": "60d21b4667d0d8992e610c93",
-          "customerId": "60d21b4667d0d8992e610c85",
-          "voucherId": "60d21b4667d0d8992e610c91",
-          "paymentDetails": {
-            "paymentId": "PAY-123456789",
-            "paymentStatus": "completed",
-            "paymentEmail": "customer@example.com",
-            "amount": 99.99,
-            "provider": "paypal"
-          },
-          "createdAt": "2023-06-22T19:12:38.657Z",
-          "updatedAt": "2023-06-22T19:12:38.657Z"
-        }
-      ]
-    }
-    ```
-  - **Error Codes**:
-    - 400 Bad Request - Invalid customer ID format
-    - 404 Not Found - Customer not found
-
-#### Create Order
-
-Creates a new order.
-
-- **URL**: `/orders`
-- **Method**: `POST`
-- **Access**: Private
-- **Request Body**:
-  ```json
-  {
-    "customerId": "60d21b4667d0d8992e610c85",
-    "voucherId": "60d21b4667d0d8992e610c91",
-    "paymentDetails": {
-      "paymentId": "PAY-123456789",
-      "paymentStatus": "completed",
-      "paymentEmail": "customer@example.com",
-      "amount": 99.99,
-      "provider": "paypal"
-    }
-  }
-  ```
-- **Response**:
-  - **Code**: 201 Created
-  - **Content**:
-    ```json
-    {
-      "success": true,
-      "data": {
-        "_id": "60d21b4667d0d8992e610c93",
-        "customerId": "60d21b4667d0d8992e610c85",
-        "voucherId": "60d21b4667d0d8992e610c91",
-        "paymentDetails": {
-          "paymentId": "PAY-123456789",
-          "paymentStatus": "completed",
-          "paymentEmail": "customer@example.com",
-          "amount": 99.99,
-          "provider": "paypal"
-        },
-        "createdAt": "2023-06-22T19:12:38.657Z",
-        "updatedAt": "2023-06-22T19:12:38.657Z"
-      }
-    }
-    ```
-  - **Error Codes**:
-    - 400 Bad Request - Validation error, invalid ID format, or voucher already purchased
-    - 404 Not Found - Customer or voucher not found
-
-#### Update Order
-
-Updates an existing order.
-
-- **URL**: `/orders/:id`
-- **Method**: `PUT`
-- **URL Parameters**: 
-  - `id`: MongoDB ObjectId of the order
-- **Access**: Private/Admin
-- **Request Body**:
-  ```json
-  {
-    "paymentDetails": {
-      "paymentId": "PAY-987654321",
-      "paymentStatus": "completed",
-      "paymentEmail": "updated.customer@example.com",
-      "amount": 149.99,
-      "provider": "stripe"
-    }
-  }
-  ```
-- **Response**:
-  - **Code**: 200 OK
-  - **Content**:
-    ```json
-    {
-      "success": true,
-      "data": {
-        "_id": "60d21b4667d0d8992e610c93",
-        "customerId": "60d21b4667d0d8992e610c85",
-        "voucherId": "60d21b4667d0d8992e610c91",
-        "paymentDetails": {
-          "paymentId": "PAY-987654321",
-          "paymentStatus": "completed",
-          "paymentEmail": "updated.customer@example.com",
-          "amount": 149.99,
-          "provider": "stripe"
-        },
-        "createdAt": "2023-06-22T19:12:38.657Z",
-        "updatedAt": "2023-06-22T19:15:38.657Z"
-      }
-    }
-    ```
-  - **Error Codes**:
-    - 400 Bad Request - Invalid ID format or validation error
-    - 404 Not Found - Order not found
-
-#### Delete Order
-
-Deletes an order.
-
-- **URL**: `/orders/:id`
-- **Method**: `DELETE`
-- **URL Parameters**: 
-  - `id`: MongoDB ObjectId of the order
-- **Access**: Private/Admin
-- **Response**:
-  - **Code**: 200 OK
-  - **Content**:
-    ```json
-    {
-      "success": true,
-      "data": {}
-    }
-    ```
-  - **Error Codes**:
-    - 400 Bad Request - Invalid ID format
-    - 404 Not Found - Order not found
-
-## Data Models
-
-### User
-
-```typescript
-{
-  name: string;          // Required, 2-50 characters
-  email: string;         // Required, unique, valid email format
-  password: string;      // Required, min 8 characters (stored hashed)
-  role: string;          // Required, enum: ['admin', 'store_manager', 'customer']
-  createdAt: Date;       // Automatically set
-  updatedAt: Date;       // Automatically updated
-}
-```
-
-### Store
-
-```typescript
-{
-  name: string;          // Required
-  ownerId: ObjectId;     // Required, reference to User
-  email: string;         // Required, unique, valid email format
-  phone: string;         // Required
-  address: string;       // Required
-  createdAt: Date;       // Automatically set
-  updatedAt: Date;       // Automatically updated
-}
-```
-
-### Product
-
-```typescript
-{
-  storeId: ObjectId;     // Required, reference to Store
-  name: string;          // Required
-  description: string;   // Required
-  price: number;         // Required, min: 0
-  isActive: boolean;     // Default: true
-  createdAt: Date;       // Automatically set
-  updatedAt: Date;       // Automatically updated
-}
-```
-
-### Voucher
-
-```typescript
-{
-  storeId: ObjectId;     // Required, reference to Store
-  productId: ObjectId;   // Required, reference to Product
-  customerId: ObjectId;  // Optional, reference to User (customer)
-  code: string;          // Required, unique
-  status: string;        // Required, enum: ['active', 'redeemed', 'expired'], default: 'active'
-  expirationDate: Date;  // Required
-  qrCode: string;        // Required, base64 encoded QR code image
-  createdAt: Date;       // Automatically set
-  updatedAt: Date;       // Automatically updated
-}
-```
-
-### Order
-
-```typescript
-{
-  customerId: ObjectId;     // Required, reference to User
-  voucherId: ObjectId;      // Required, reference to Voucher
-  paymentDetails: {
-    paymentId: string;      // Required
-    paymentStatus: string;  // Required, enum: ['pending', 'completed', 'failed']
-    paymentEmail: string;   // Required, valid email format
-    amount: number;         // Required, min: 0.01
-    provider: string;       // Required, enum: ['mercadopago', 'paypal', 'stripe']
-  };
-  createdAt: Date;          // Automatically set
-  updatedAt: Date;          // Automatically updated
-}
-```
+Each template displays the following information:
+- Sender name and email
+- Receiver name and email
+- Product details
+- Personal message
+- Expiration date
+- QR code for redemption
+- Store information
 
 ## Postman Collection
 
