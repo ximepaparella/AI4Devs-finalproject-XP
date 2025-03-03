@@ -20,9 +20,9 @@ export default function DashboardLayout({ children, title = 'Dashboard' }: Dashb
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', current: router.pathname === '/dashboard' },
-    { name: 'Products', href: '/dashboard/products', current: router.pathname.startsWith('/dashboard/products') },
-    { name: 'Orders', href: '/dashboard/orders', current: router.pathname.startsWith('/dashboard/orders') },
-    { name: 'Vouchers', href: '/dashboard/vouchers', current: router.pathname.startsWith('/dashboard/vouchers') },
+    { name: 'Products', href: '/products', current: router.pathname.startsWith('/products') },
+    { name: 'Orders', href: '/orders', current: router.pathname.startsWith('/orders') },
+    { name: 'Vouchers', href: '/vouchers', current: router.pathname.startsWith('/vouchers') },
     { name: 'Stores', href: '/stores', current: router.pathname.startsWith('/stores') },
   ];
 
