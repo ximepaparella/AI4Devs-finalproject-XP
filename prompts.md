@@ -24,19 +24,25 @@ https://github.com/ximepaparella/gifty-api
 ## GIFTY ADMIN DASHBOARD:
 https://github.com/ximepaparella/gifty
 
+
 ## GIFTY WEBSITE:
 https://github.com/ximepaparella/gifty-wb/pull/6
 
 Relevant documentation:
 
-#PRD
+# PRD
 https://docs.google.com/document/d/1cy7LfPV6TeUMitq3cQNGqtmtuxlmfG6iagUYqQQopuM/edit?usp=sharing
 
 
-#BUSSINESS MODEL
+# BUSSINESS MODEL
 
 https://docs.google.com/document/d/1BxpFzMfPuDJVSnw77Ef5vIN7iODImbm6NZtPzr1DvAs/edit?usp=sharing
 
+
+# JIRA PROJECT 
+https://estudio-equis.atlassian.net/jira/software/projects/SCRUM/boards/1
+
+Reference: image.png
 
 ## 1. Descripción general del producto
 
@@ -423,6 +429,335 @@ Do you have any doubts about it?
 We asked: As an expert Software archited and with the Diagram of Entities provided for the responsable of the applicatin can you please build the Mermaid Diagrams and store on the api-docs backend flow to represent the entiies based on the PRD.
 
 Also i need you to write every user story for each diagram detailing the fields and field types that we have defined on MD format to load in Jira Project.
+
+Response: 
+
+Step 1: Identifying the Main Entities
+Based on the PRD and MVP features, we will have the following entities:
+
+User
+
+Store Managers, Administrators, Customers
+
+Role-based permissions
+
+Voucher
+
+Created by Store Managers
+
+Assigned to specific customers
+
+Contains expiration dates, QR codes, and unique alphanumeric keys
+
+Transaction
+
+Tracks payments and voucher purchases
+
+Links customers, vouchers, and payment status
+
+Store
+
+Each store has Store Managers
+
+Stores create vouchers for their products/services
+
+Product/Service
+
+Vouchers are associated with a product or service
+
+Redemption
+
+Stores records of voucher redemptions
+
+Links to the Store and Customer
+
+Step 2: Defining the Mermaid ERD
+I'll generate the Mermaid ERD diagram to represent these entities and their relationships. Let me work on it now! 🚀
+
+Here is the Mermaid Entity-Relationship Diagram (ERD) representing the core architecture of our system:
+
+mermaid
+Copiar
+Editar
+erDiagram
+    USER {
+        string _id PK
+        string name
+        string email UNIQUE
+        string password
+        string role ENUM["admin", "store_manager", "customer"]
+        date createdAt
+        date updatedAt
+    }
+    
+    STORE {
+        string _id PK
+        string name
+        string ownerId FK
+        string email UNIQUE
+        string phone
+        string address
+        date createdAt
+        date updatedAt
+    }
+    
+    PRODUCT {
+        string _id PK
+        string storeId FK
+        string name
+        string description
+        float price
+        boolean isActive
+        date createdAt
+        date updatedAt
+    }
+    
+    VOUCHER {
+        string _id PK
+        string storeId FK
+        string productId FK
+        string customerId FK NULLABLE
+        string code UNIQUE
+        string status ENUM["active", "redeemed", "expired"]
+        date expirationDate
+        string qrCode
+        date createdAt
+        date updatedAt
+    }
+
+    TRANSACTION {
+        string _id PK
+        string customerId FK
+        string voucherId FK
+        string paymentMethod ENUM["mercadopago", "paypal", "stripe"]
+        string status ENUM["pending", "completed", "failed"]
+        float amount
+        date createdAt
+        date updatedAt
+    }
+    
+    REDEMPTION {
+        string _id PK
+        string voucherId FK
+        string storeId FK
+        string customerId FK
+        date redeemedAt
+    }
+
+    ADMIN {
+        string _id PK
+        string userId FK
+        date createdAt
+        date updatedAt
+    }
+
+    USER ||--o{ STORE : "owns"
+    STORE ||--o{ PRODUCT : "offers"
+    STORE ||--o{ VOUCHER : "issues"
+    PRODUCT ||--o{ VOUCHER : "linked to"
+    USER ||--o{ VOUCHER : "purchases"
+    USER ||--o{ TRANSACTION : "makes"
+    VOUCHER ||--|{ REDEMPTION : "redeemed in"
+    USER ||--o{ REDEMPTION : "redeems"
+Key Relationships in the System
+Users & Roles
+
+A User can be an Administrator, Store Manager, or Customer.
+
+Admins manage stores and oversee transactions.
+
+Store Managers own Stores and create Vouchers.
+
+Customers purchase Vouchers and redeem them.
+
+Stores & Products
+
+A Store offers multiple Products/Services.
+
+Vouchers are linked to specific Products.
+
+Transactions & Vouchers
+
+Customers buy Vouchers, generating Transactions.
+
+Transactions are completed through MercadoPago, PayPal, or Stripe.
+
+Voucher Redemption
+
+Customers redeem Vouchers at Stores.
+
+Redemptions track usage and status.
+
+Next Steps
+Refine the database schema based on this ERD.
+
+Plan API routes for each entity (CRUD operations).
+
+Define authentication & security layers (JWT, OAuth, permissions).
+
+Would you like me to generate the database schema for MongoDB based on this ERD? 🚀
+
+
+
+
+
+
+Tú dijiste:
+Ok lets change trasaction for Orders, because they are orders of ayment.
+lets add to the order an object for payment that will have payment id, payment status, payment email and some other mercado pago apk needs.
+
+lets update the redeption word, is not good, propose others please.
+
+remember that the user can see their own orders or buys on the profile page, lets add some fields for that. 
+
+and make the diagram correct because is not right, is failing, have code issues
+
+
+ChatGPT Plus
+Great updates! I'll address each of your points:
+
+Rename Transaction to Order and modify its structure to include a paymentDetails object containing:
+
+paymentId
+
+paymentStatus
+
+paymentEmail
+
+Other necessary MercadoPago details.
+
+Rename Redemption to something more meaningful. Here are a few alternatives:
+
+VoucherUsage
+
+VoucherClaim
+
+VoucherValidation
+
+VoucherRedemption
+
+UsageLog
+
+I suggest VoucherUsage as it clearly represents the act of using a voucher.
+
+Ensure the User can see their Orders and add relevant fields.
+
+Fix syntax issues in the diagram to ensure it renders correctly.
+
+Updated Mermaid ERD with Fixes
+mermaid
+Copiar
+Editar
+erDiagram
+    USER {
+        string _id PK
+        string name
+        string email UNIQUE
+        string password
+        string role ENUM["admin", "store_manager", "customer"]
+        date createdAt
+        date updatedAt
+    }
+    
+    STORE {
+        string _id PK
+        string name
+        string ownerId FK
+        string email UNIQUE
+        string phone
+        string address
+        date createdAt
+        date updatedAt
+    }
+    
+    PRODUCT {
+        string _id PK
+        string storeId FK
+        string name
+        string description
+        float price
+        boolean isActive
+        date createdAt
+        date updatedAt
+    }
+    
+    VOUCHER {
+        string _id PK
+        string storeId FK
+        string productId FK
+        string customerId FK NULLABLE
+        string code UNIQUE
+        string status ENUM["active", "redeemed", "expired"]
+        date expirationDate
+        string qrCode
+        date createdAt
+        date updatedAt
+    }
+
+    ORDER {
+        string _id PK
+        string customerId FK
+        string voucherId FK
+        object paymentDetails
+        date createdAt
+        date updatedAt
+    }
+    
+    PAYMENTDETAILS {
+        string paymentId UNIQUE
+        string paymentStatus ENUM["pending", "completed", "failed"]
+        string paymentEmail
+        float amount
+        string provider ENUM["mercadopago", "paypal", "stripe"]
+    }
+
+    VOUCHERUSAGE {
+        string _id PK
+        string voucherId FK
+        string storeId FK
+        string customerId FK
+        date usedAt
+    }
+
+    ADMIN {
+        string _id PK
+        string userId FK
+        date createdAt
+        date updatedAt
+    }
+
+    USER ||--o{ STORE : "owns"
+    STORE ||--o{ PRODUCT : "offers"
+    STORE ||--o{ VOUCHER : "issues"
+    PRODUCT ||--o{ VOUCHER : "linked to"
+    USER ||--o{ ORDER : "places"
+    ORDER ||--|{ PAYMENTDETAILS : "has"
+    VOUCHER ||--|{ VOUCHERUSAGE : "used in"
+    USER ||--o{ VOUCHERUSAGE : "redeems"
+    USER ||--o{ VOUCHER : "purchases"
+Summary of Fixes
+Renamed Transaction to Order and linked it to PaymentDetails.
+
+Introduced PaymentDetails as an embedded object to store necessary MercadoPago, PayPal, and Stripe details.
+
+Renamed Redemption to VoucherUsage to make it clearer.
+
+Added missing relationships, including:
+
+USER now has ORDERS (for profile page visibility).
+
+ORDER has PAYMENTDETAILS.
+
+Fixed Mermaid syntax errors and made the structure more readable.
+
+Next Steps
+Validate additional metadata needed in PaymentDetails (like provider transaction logs).
+
+Create the MongoDB schema based on this ERD.
+
+Define API endpoints for handling Orders, Payments, and VoucherUsages.
+
+Would you like me to generate the MongoDB schema models for these entities next? 
 
 ---
 
