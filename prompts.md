@@ -14,6 +14,19 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 
 ---
 
+## Repositories:
+ 
+## GIFTY API: 
+https://github.com/ximepaparella/gifty-api
+
+## GIFTY ADMIN DASHBOARD:
+https://github.com/ximepaparella/gifty
+
+## GIFTY WEBSITE:
+https://github.com/ximepaparella/gifty-wb/pull/6
+
+
+
 ## 1. Descripción general del producto
 
 **Prompt 1:** 
@@ -245,15 +258,29 @@ Ensure the User can see their Orders and add relevant fields.
 Fix syntax issues in the diagram to ensure it renders correctly.
 
 
-**Prompt 3:**
-
 
 
 ### **2.2. Descripción de componentes principales:**
 
 **Prompt 1:**
+We need to create a flow to allow the administrator to enter the dashboard depository.
+a- Create an account of an user Store manager
+b- Create a new store for the Store manager
+c- Add a crud of products or services to allow the Store administrator to manage their products.
+
 
 **Prompt 2:**
+
+We need to create a flow that allows to the final client to enter the Application Gifty page and:
+- Search on a search catalog the last products or stores availables for buy
+- Start to fill the voucher form that we have already created for one product or service, complete the voucher form using the created templates.
+- Start the 3 steps checkout process to allow to:
+- Create a customer
+- Create an order witht he voucher information
+- Save the new order on the platform and the api will dispatch 2 flows:
+   a. Voucher PDF generation an upload to the platform.
+   b. Send the emails to the store manager, customer and reciever of the voucher buy.
+
 
 **Prompt 3:**
 
@@ -261,6 +288,7 @@ Fix syntax issues in the diagram to ensure it renders correctly.
 
 **Prompt 1:** 
 
+### BACKEND API PROPMPT: 
 As an expert Software Architect i need you to create our API For the Gifty Project a Node.js REST API project following Hexagonal Architecture with Screaming Architecture file organization.
 
 ## Project Details:
@@ -270,11 +298,6 @@ As an expert Software Architect i need you to create our API For the Gifty Proje
 - **Authentication:** JWT-based authentication
 - **Folder Structure:** Hexagonal Architecture (Ports & Adapters)
 - **Code Style:** ESLint + Prettier
-
-## Monorepo Setup:
-- Use **Turborepo** or **Nx** for monorepo management.
-- Create a package for `backend` in the monorepo.
-- Later, we will add the `frontend` package.
 
 ## Folder Structure (Screaming Architecture):
 /gift-voucher-platform ├── packages │ ├── backend │ │ ├── src │ │ │ ├── application (use-cases) │ │ │ ├── domain (entities, aggregates, domain logic) │ │ │ ├── infrastructure (database, API clients, repositories) │ │ │ ├── interfaces (controllers, HTTP requests, event listeners) │ │ │ ├── config (env variables, database config) │ │ │ ├── server.ts (Express setup) │ │ │ ├── app.ts (App entry point) │ │ ├── package.json │ │ ├── tsconfig.json │ │ ├── .env.example │ │ ├── README.md │ ├── frontend (To be added later) ├── turbo.json (or nx.json for workspace management) ├── package.json (Monorepo root) ├── .gitignore ├── README.md
@@ -324,7 +347,16 @@ Do you have any doubts?
 
 **Prompt 2:**
 
+
+## Gifty Admin Dashboard:
+AS an expert Frontend architect i need you to setup a Frontend repository to manage all the products,services and stores of our Gifty Platform.
+We will need to create a Next JS repository with this specifications:
+- 
+
 **Prompt 3:**
+
+## Gifty Website:
+
 
 ### **2.4. Infraestructura y despliegue**
 
@@ -345,11 +377,28 @@ Do you have any doubts?
 ### **2.6. Tests**
 
 **Prompt 1:**
+Gifty API: 
+As an expert backend architect and automated QA i need you to analize this entire Backend API repository to propose a detailed plan of Test Coverage.
+We need to have at least 50% of coverage of this API, starting with the utils and the main flows to guarantee the api correct working.
+
+Do you have any doubts about it?
 
 **Prompt 2:**
+Gifty Dashboard: 
+As an expert Frontend architect and automated QA i need you to setup this nextJS reposository with JEST and create an Basic Test Suite to this project. Analize this entire repository to propose a detailed plan of Test Coverage.
+
+We need to have at least 50% of coverage of this Dashboard, starting with the utils and the main flows to guarantee the correct working.
+
+Do you have any doubts about it?
+
 
 **Prompt 3:**
+Gifty Website:
+As an expert Frontend architect and automated QA i need you to setup this Vite Js reposository with JEST and create an Basic Test Suite to this project. Analize this entire repository to propose a detailed plan of Test Coverage.
 
+We need to have at least 50% of coverage of this Dashboard, starting with the utils and the main flows to guarantee the correct working.
+
+Do you have any doubts about it?
 ---
 
 ### 3. Modelo de Datos
@@ -376,9 +425,145 @@ Do you have any doubts?
 
 **Prompt 1:**
 
+Based on our PRD documentation and as an expert Product owner and business Analyst, i need you to help me to write the Main EPIC to setup our Admin Dashboard, to setup all the entities and flows to have the CRUDS for the main entities of this project. Return on MD format.
+
+GPT4o - Response
+
+# Title: Define and Implement Mongoose Schemas for all Entities
+
+## Description
+We need to define and implement the Mongoose schemas for each entity based on the architecture diagram. These schemas must include proper relationships, indexing, and validation.
+
+## Tasks
+
+Create the following schemas in `/src/domain/models/`:
+
+- **User Schema**
+- **Store Schema**
+- **Product Schema**
+- **Voucher Schema**
+- **Order Schema**
+- **PaymentDetails Schema** (embedded in Order)
+- **VoucherUsage Schema**
+
+Additional tasks:
+
+- Define Mongoose relationships (`ref` and `populate` where needed).
+- Implement schema validation using Mongoose and Joi.
+- Ensure each schema has timestamps (`createdAt`, `updatedAt`).
+- Add indexes to frequently queried fields (e.g., `email`, `voucherCode`, `storeId`).
+- Commit schema definitions to the repository.
+
+## Acceptance Criteria
+
+- Each entity has a fully defined Mongoose schema.
+- Schemas include validation, timestamps, and relationships.
+- Schemas are correctly linked together via references.
+- Data can be stored and retrieved correctly.
+
+## Entity Relationship Summary
+
+### User
+- Owns Stores
+- Places Orders
+- Purchases Vouchers
+- Redeems Vouchers (`VoucherUsage`)
+
+### Store
+- Offers Products
+- Issues Vouchers
+
+### Product
+- Linked to Vouchers
+
+### Voucher
+- Purchased by Users
+- Used in `VoucherUsage`
+
+### Order
+- Has `PaymentDetails`
+
+### VoucherUsage
+- Used in Stores
+- Linked to Users & Vouchers
+
+
+
 **Prompt 2:**
 
-**Prompt 3:**
+Based on our PRD documentation and as an expert Product owner and business Analyst, i need you to help me to write the Main EPIC to setup our Admin Dashboard, to setup all the entities and flows to have the CRUDS for the main entities of this project.
+
+GTPo - Response:
+
+# Title: Develop CRUD Endpoints for User, Store, Product, Voucher, Order, PaymentDetails, and VoucherUsage
+
+## Description
+We need to implement CRUD operations for each entity using Express.js.
+
+## Tasks
+
+### Implement CRUD controllers in `/src/interfaces/http/controllers/` for:
+- `UserController.js`
+- `StoreController.js`
+- `ProductController.js`
+- `VoucherController.js`
+- `OrderController.js`
+- `VoucherUsageController.js`
+
+### Define the following API endpoints in `/src/infrastructure/routes/`:
+
+#### Users
+- `GET /users`
+- `POST /users`
+- `GET /users/:id`
+- `PUT /users/:id`
+- `DELETE /users/:id`
+
+#### Stores
+- `GET /stores`
+- `POST /stores`
+- `GET /stores/:id`
+- `PUT /stores/:id`
+- `DELETE /stores/:id`
+
+#### Products
+- `GET /products`
+- `POST /products`
+- `GET /products/:id`
+- `PUT /products/:id`
+- `DELETE /products/:id`
+
+#### Vouchers
+- `GET /vouchers`
+- `POST /vouchers`
+- `GET /vouchers/:id`
+- `PUT /vouchers/:id`
+- `DELETE /vouchers/:id`
+
+#### Orders
+- `GET /orders`
+- `POST /orders`
+- `GET /orders/:id`
+- `PUT /orders/:id`
+- `DELETE /orders/:id`
+
+#### Voucher Usages
+- `GET /voucher-usages`
+- `POST /voucher-usages`
+- `GET /voucher-usages/:id`
+
+### Additional Implementation Requirements:
+- Use Joi middleware for request validation.
+- Implement proper error handling (e.g., 404 Not Found, 400 Bad Request).
+- Use Mongoose `.populate()` to retrieve related data in `GET` requests.
+
+## Acceptance Criteria
+
+- All CRUD endpoints are implemented.
+- Each request is validated before processing.
+- API follows RESTful best practices.
+- Controllers interact correctly with the database.
+
 
 ---
 
@@ -386,16 +571,219 @@ Do you have any doubts?
 
 **Prompt 1:**
 
+As an expert product Owner and business analyst and based on our main EPIC stories i need you to write our next 3 tickets to complete the main api flow following the good practices of Scrum for ticket writting. Return in MD format
+
+
+const StoreSchema = new mongoose.Schema({
+  _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+  name: { type: String, required: true },
+  ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  email: { type: String, required: true, unique: true },
+  phone: { type: String, required: true },
+  address: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+
+
+
+Relationships:
+
+A Store is owned by a User (Store ownerId → User _id).
+
+A Store can offer multiple Products (Store _id → Product storeId).
+
+A Store can issue multiple Vouchers (Store _id → Voucher storeId).
+
+Store Schema Indexes
+
+javascript
+
+CopiarEditar
+
+StoreSchema.index({ ownerId: 1 }); // Fetch all stores by owner StoreSchema.index({ email: 1 }, { unique: true }); // Fast lookup by email 
+
+✅ Optimized Queries:
+
+db.stores.find({ ownerId: ObjectId("userId") })
+
+db.stores.find({ email: "store@example.com" })
+
+
+
+----
+
+const ProductSchema = new mongoose.Schema({
+  _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: "Store", required: true },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  price: { type: Number, required: true },
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+
+Relationships:
+
+A Product is offered by a Store (Product storeId → Store _id).
+
+A Product can be linked to multiple Vouchers (Product _id → Voucher productId).
+
+
+
+---
+
+User Story: Creación de una Orden
+
+Como usuario, quiero poder realizar una compra de un voucher en la plataforma, asegurándome de que mi pago sea procesado correctamente y que el voucher se asocie a mi cuenta y a la del destinatario correspondiente.
+
+Criterios de Aceptación:
+
+La orden debe estar asociada a un usuario registrado en la plataforma mediante el campo customerId.
+
+La orden debe contener detalles de pago (paymentDetails), incluyendo:
+
+paymentId: Identificador único del pago.
+
+paymentStatus: Estado del pago, el cual puede ser pending, completed o failed.
+
+paymentEmail: Correo electrónico del pagador, validado según el formato correcto de email.
+
+amount: Monto total de la compra, que debe ser mayor a 0.
+
+provider: Proveedor de pago utilizado (mercadopago, paypal o stripe).
+
+La orden debe estar vinculada a un voucher (voucher), con los siguientes datos:
+
+storeId: Identificador del negocio asociado.
+
+productId: Identificador del producto adquirido.
+
+code: Código único del voucher.
+
+status: Estado del voucher (active, redeemed o expired).
+
+expirationDate: Fecha de expiración del voucher.
+
+qrCode: Código QR generado para la validación.
+
+senderName y senderEmail: Datos del remitente.
+
+receiverBame y receiverEmail: Datos del destinatario.
+
+message: Mensaje personalizado del remitente (hasta 500 caracteres).
+
+template: Plantilla de diseño utilizada en el voucher (template1 - template5).
+
+La orden debe almacenar las fechas de creación y actualización (createdAt y updatedAt).
+
+La base de datos debe garantizar que el código del voucher sea único y que las búsquedas puedan realizarse eficientemente por usuario, estado del pago y estado del voucher.
+
+Relaciones:
+
+Una orden está asociada a un usuario (customerId → User _id).
+
+Una orden está asociada a un voucher (voucher.productId → Product _id).
+
+Una orden contiene información de pago embebida (paymentDetails).
+
+Casos de Prueba:
+✅ Crear una orden con un pago completado y un voucher activo.
+✅ Intentar crear una orden sin customerId y validar que falle.
+✅ Validar que no se puede crear una orden con un monto amount menor a 0.01.
+✅ Probar que los emails de paymentEmail, sender_email y receiver_email cumplan con el formato correcto.
+✅ Confirmar que un voucher expirado no pueda ser canjeado.
+
+
+GPT 4o Response:
+
 **Prompt 2:**
 
-**Prompt 3:**
+As an expert product Owner and business analyst and based on our main EPIC stories i need you to write our next 3 tickets to complete the store managers admin flow following the good practices of Scrum for ticket writting. Return in MD format
+
+
+
+
+GPT 4o Response: 
+
+
+Ticket a: 
+Title: Develop UI for voucher purchase
+
+Description: Implement the frontend flow for purchasing a voucher.
+
+Tasks:
+
+Allow customers to select a voucher and proceed to checkout.
+
+Integrate with the payment gateway.
+
+Show purchase confirmation and receipt.
+
+
+----
+
+Title: Develop UI for creating a voucher
+
+Description: Implement a form on the Store Manager's dashboard to allow voucher creation.
+
+Tasks:
+
+Design and implement a form with fields (storeId, productId, code, expirationDate).
+
+Validate inputs before submitting.
+
+Display success/failure messages.
+
+Update the dashboard to reflect new vouchers.
+
+
+---
+
+Title: Develop UI for voucher redemption
+
+Description: Implement the interface for scanning and redeeming vouchers.
+
+Tasks:
+
+Allow Store Managers to enter a voucher code or scan a QR code.
+
+Show success/failure messages based on validation.
+
+Update the dashboard with redeemed vouchers.
 
 ---
 
 ### 7. Pull Requests
 
 **Prompt 1:**
+As an expert software Architect you must implement code Rabbit on our repositories to have all the generated Pull Requests reviews for an expert and with suggestions of improvements, security risks and others. Can you provide the next steps:
 
-**Prompt 2:**
 
-**Prompt 3:**
+## 🔧 Next Steps for Setting Up CodeRabbit
+
+To integrate CodeRabbit with your repository and ensure seamless AI-powered PR reviews, follow these steps:
+
+1. **Install the GitHub App**  
+   Visit [CodeRabbit GitHub App](https://github.com/apps/coderabbit-ai) and install it on your repository or organization.
+
+2. **Repository Access**  
+   Make sure CodeRabbit has access to the repository you want to review pull requests in.
+
+3. **Configuration (Optional but Recommended)**  
+   Create a `.coderabbit.yml` configuration file at the root of your repository to customize the behavior. Example:
+
+   ```yaml
+   pr_review:
+     summary: true
+     suggestions: true
+     questions: true
+     approve_if_no_suggestions: false
+     language: en
+
+
+
+All the pull request of the BACKEND API and Admin dashboards has been reviewed by coderabbit.
