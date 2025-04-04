@@ -15,9 +15,11 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 ---
 
 ## Repositories:
- 
+The main documentation of Each platform is inside each repository.
+
 ## GIFTY API: 
 https://github.com/ximepaparella/gifty-api
+
 
 ## GIFTY ADMIN DASHBOARD:
 https://github.com/ximepaparella/gifty
@@ -25,6 +27,15 @@ https://github.com/ximepaparella/gifty
 ## GIFTY WEBSITE:
 https://github.com/ximepaparella/gifty-wb/pull/6
 
+Relevant documentation:
+
+#PRD
+https://docs.google.com/document/d/1cy7LfPV6TeUMitq3cQNGqtmtuxlmfG6iagUYqQQopuM/edit?usp=sharing
+
+
+#BUSSINESS MODEL
+
+https://docs.google.com/document/d/1BxpFzMfPuDJVSnw77Ef5vIN7iODImbm6NZtPzr1DvAs/edit?usp=sharing
 
 
 ## 1. Descripción general del producto
@@ -351,28 +362,32 @@ Do you have any doubts?
 ## Gifty Admin Dashboard:
 AS an expert Frontend architect i need you to setup a Frontend repository to manage all the products,services and stores of our Gifty Platform.
 We will need to create a Next JS repository with this specifications:
-- 
+
+- Next JS project with pages router
+- JEST for unit testing
+- AntD Components
+- CSS modules
 
 **Prompt 3:**
 
 ## Gifty Website:
 
+Lovable Platform:
+AS an expert Frontend architect i need you to setup a Frontend repository to manage all the products,services and stores of our Gifty Platform.
+We will need to create a Vite JS Landing Page with a Index Page, Store page to search products. A Product Detail Page with the Voucher form to complete,and a compelte Checkout process based on our PRD and our API Documetation to match the fields and api requierements.
+
+- Vite JS project
+- JEST for unit testing
+- Tailwind
+
 
 ### **2.4. Infraestructura y despliegue**
 
-**Prompt 1:**
-
-**Prompt 2:**
-
-**Prompt 3:**
+We didnt deploy our project.
 
 ### **2.5. Seguridad**
 
-**Prompt 1:**
-
-**Prompt 2:**
-
-**Prompt 3:**
+We just included JWT as security.
 
 ### **2.6. Tests**
 
@@ -403,21 +418,17 @@ Do you have any doubts about it?
 
 ### 3. Modelo de Datos
 
-**Prompt 1:**
+ 
 
-**Prompt 2:**
+We asked: As an expert Software archited and with the Diagram of Entities provided for the responsable of the applicatin can you please build the Mermaid Diagrams and store on the api-docs backend flow to represent the entiies based on the PRD.
 
-**Prompt 3:**
+Also i need you to write every user story for each diagram detailing the fields and field types that we have defined on MD format to load in Jira Project.
 
 ---
 
 ### 4. Especificación de la API
 
-**Prompt 1:**
-
-**Prompt 2:**
-
-**Prompt 3:**
+All the APi specifications have been build with the same Architecture prompt provided and are detailed on the PRD
 
 ---
 
